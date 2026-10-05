@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Avaliação de Ocorrências · Direct</title>
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bk:#000000; --ink:#1D1D1F; --ink-2:#6E6E73; --ink-3:#86868B;
+  --wt:#FFFFFF; --gray:#F5F5F7; --gray-2:#EBEBED; --line:#D2D2D7;
+  --green:#1E8A2E; --green-d:#146022; --green-l:#3ECF5A; --green-bg:#EAF6EC;
+  --red:#C7362F; --red-bg:#FBEDEC; --amber:#9A6700; --amber-bg:#FFF8E6;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --body:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+  --sh:0 1px 3px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  --bar:52px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:var(--body);background:var(--wt);color:var(--ink);
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}
+button,input,select,textarea{font-family:inherit}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- barra ---------- */
+.appbar{position:sticky;top:0;z-index:50;height:var(--bar);display:flex;align-items:center;gap:10px;
+  padding:0 14px;background:rgba(0,0,0,.82);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);color:var(--wt)}
+.appbar .back{background:none;border:0;color:var(--wt);font-size:30px;line-height:1;
+  padding:0 6px 4px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s}
+.appbar .back.on{opacity:1;pointer-events:auto}
+.appbar .ttl{font-size:16px;font-weight:600;letter-spacing:-.01em}
+.appbar .dir{color:var(--green-l)}
+
+/* ---------- telas ---------- */
+.view{display:none}
+.view.on{display:block;animation:fade .24s cubic-bezier(.32,.72,0,1)}
+
+/* ---------- menu inicial ---------- */
+#v-menu{background:var(--bk);min-height:calc(100vh - var(--bar));display:flex;align-items:center}
+.menu{max-width:560px;margin:auto;padding:26px 26px 46px;text-align:center;width:100%}
+.menu-eyebrow{font-size:13.5px;font-weight:600;color:var(--green-l);margin:0;letter-spacing:.01em}
+.menu-h1{font-size:clamp(26px,7.4vw,34px);font-weight:700;letter-spacing:-.03em;line-height:1.12;
+  margin:8px 0 30px;color:var(--wt)}
+.big{display:block;width:100%;border:0;background:var(--green);color:var(--wt);font-family:var(--body);
+  font-size:19px;font-weight:600;letter-spacing:-.015em;padding:21px 18px;border-radius:20px;
+  cursor:pointer;margin-bottom:13px;transition:transform .15s;text-align:left}
+.big small{display:block;font-size:13.5px;font-weight:400;opacity:.78;margin-top:3px}
+.big.alt{background:#1C1C1E;color:var(--wt);box-shadow:inset 0 0 0 1.5px #3A3A3C}
+.big:active{transform:scale(.985)}
+.big[disabled]{opacity:.45;cursor:default}
+.instbtn{display:block;width:100%;border:1px solid #2A2A2D;background:transparent;color:#A1A1A6;
+  font-family:var(--body);font-size:15.5px;font-weight:600;padding:14px;border-radius:16px;
+  cursor:pointer;margin-top:4px}
+.menu-foot{font-size:12.5px;color:#86868B;margin:26px 0 0}
+.versao{font-family:var(--mono);font-size:11px;color:#5A5A5E;text-align:center;margin:10px 0 0;letter-spacing:.06em}
+.assin{display:flex;align-items:center;gap:11px;background:#111;border:1px solid #222;border-radius:16px;
+  padding:12px 14px;margin:14px auto 0;max-width:340px;text-align:left}
+.assin .av{width:36px;height:36px;border-radius:50%;background:var(--green);color:var(--wt);
+  display:grid;place-items:center;font-weight:700;font-size:14px;flex:0 0 auto}
+.assin .at{display:flex;flex-direction:column;line-height:1.3}
+.assin .at b{font-size:14px;color:var(--wt)}
+.assin .at small{font-size:11.5px;color:#86868B}
+
+
+/* índice de ordens */
+.indice{position:absolute;left:26px;right:26px;z-index:40;max-height:56vh;overflow-y:auto;
+  background:var(--wt);border:1px solid var(--line);border-radius:18px;padding:10px;
+  box-shadow:var(--sh);display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:4px}
+.indice[hidden]{display:none}
+.idx{display:flex;align-items:center;gap:10px;padding:9px 12px;border:0;background:none;
+  border-radius:10px;cursor:pointer;font-family:var(--body);font-size:14px;text-align:left;
+  color:var(--ink-2);transition:background .14s}
+.idx:hover{background:var(--gray)}
+.idx.atual{background:var(--green-bg);color:var(--ink)}
+.idx.feita{opacity:.55}
+.idxN{font:500 11.5px/1 var(--mono);color:var(--ink-3);min-width:22px;flex:0 0 auto}
+.idxNome{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.idxNota{font:600 12px/1 var(--mono);color:var(--green);flex:0 0 auto}
+
+/* ---------- conteúdo claro ---------- */
+.container{max-width:960px;margin:0 auto;padding:26px}
+.hero{background:var(--gray);border-bottom:1px solid var(--line)}
+.hero .in{max-width:960px;margin:0 auto;padding:36px 26px 32px}
+.eyebrow{font-size:13px;font-weight:600;color:var(--green);margin:0 0 6px;letter-spacing:.01em}
+.hero h1{font-size:clamp(25px,6vw,33px);font-weight:700;letter-spacing:-.03em;line-height:1.14;margin:0}
+h2{font-size:19px;font-weight:600;letter-spacing:-.02em;margin:30px 0 11px}
+.note{background:var(--green-bg);border-radius:14px;padding:14px 16px;font-size:14.5px;line-height:1.55}
+.note b{display:block;margin-bottom:3px}
+.note.alerta{background:var(--amber-bg)}
+.note.erro{background:var(--red-bg)}
+
+/* ---------- soltar arquivo ---------- */
+.drop{border:2px dashed var(--line);border-radius:20px;padding:36px 22px;text-align:center;
+  background:var(--gray);transition:.18s;cursor:pointer}
+.drop.sobre{border-color:var(--green);background:var(--green-bg)}
+.drop b{display:block;font-size:17px;font-weight:600;letter-spacing:-.02em}
+.drop small{display:block;font-size:13.5px;color:var(--ink-2);margin-top:5px}
+
+/* ---------- lista de ordens ---------- */
+.tile{display:flex;align-items:center;gap:13px;width:100%;background:var(--wt);border:0;
+  border-bottom:1px solid var(--gray-2);padding:13px 8px;text-align:left;cursor:pointer;
+  font-family:var(--body);font-size:16px;border-radius:10px;transition:background .14s}
+.tile:hover{background:var(--gray)}
+.tile:last-child{border-bottom:0}
+.tile .ic{width:40px;height:40px;border-radius:11px;background:var(--gray);color:var(--ink-2);
+  display:grid;place-items:center;font-size:13px;font-weight:700;flex:0 0 auto}
+.tile.feita .ic{background:var(--green-bg);color:var(--green)}
+.tile.baixa .ic{background:var(--red-bg);color:var(--red)}
+.tile span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
+.tile b{font-size:15.5px;font-weight:600;letter-spacing:-.01em;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.tile small{font-size:13px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .arrow{color:var(--ink-3);font-size:21px;flex:0 0 auto}
+
+/* ---------- avaliação: duas colunas, feita para teclado ---------- */
+.avalGrade{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(400px,.85fr);
+  gap:26px;max-width:1440px;margin:0 auto;padding:22px 26px 30px;align-items:start}
+.colFoto{position:sticky;top:calc(var(--bar) + 76px)}
+.colLado{display:flex;flex-direction:column;gap:14px}
+.atalhos{font-size:12.5px;color:var(--ink-3);text-align:center;margin:2px 0 0;line-height:1.9}
+.atalhos b{display:inline-block;min-width:20px;padding:2px 6px;background:var(--gray);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;
+  font:600 11px/1.3 var(--mono);color:var(--ink-2);margin:0 1px}
+
+@media(max-width:1080px){
+  .avalGrade{grid-template-columns:1fr;gap:18px;padding:18px}
+  .colFoto{position:static}
+}
+
+/* ---------- avaliação ---------- */
+.avalCab{display:flex;align-items:center;gap:16px;padding:13px 26px;border-bottom:1px solid var(--gray-2);
+  position:sticky;top:var(--bar);background:rgba(255,255,255,.93);backdrop-filter:blur(16px);z-index:30}
+.avalCab .btnIndice{background:var(--gray);border:0;border-radius:9px;width:32px;height:30px;
+  font-size:14px;color:var(--ink-2);cursor:pointer;flex:0 0 auto}
+.avalCab .btnIndice:hover{background:var(--gray-2);color:var(--ink)}
+.avalProg{flex:1;height:4px;background:var(--gray-2);border-radius:3px;overflow:hidden}
+.avalProg i{display:block;height:100%;background:var(--green);border-radius:3px;transition:width .3s}
+.avalConta{font-family:var(--mono);font-size:13px;color:var(--ink-2);flex:0 0 auto}
+.avalNota{flex:0 0 auto;min-width:40px;text-align:center;font-size:21px;font-weight:700;
+  color:var(--green);font-variant-numeric:tabular-nums}
+.avalNota.media{color:var(--amber)} .avalNota.baixa{color:var(--red)}
+
+.cliente{padding:0}
+.cliente h3{font-size:24px;font-weight:700;letter-spacing:-.03em;margin:0;line-height:1.2}
+.cliente .meta{font-size:13.5px;color:var(--ink-2);margin-top:6px;line-height:1.6}
+.descr{background:var(--gray);border-radius:14px;padding:13px 16px;margin:0;font-size:14px;
+  line-height:1.6;max-height:168px;overflow-y:auto}
+.descr b{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--ink-3);margin-bottom:4px}
+
+.fotos{border-radius:18px;overflow:hidden;background:#0C0C0D;position:relative;
+  height:min(70vh,660px);display:grid;place-items:center;box-shadow:var(--sh)}
+.fotos img{width:100%;height:100%;object-fit:contain;cursor:zoom-in}
+.fotos img.zoom{object-fit:cover;cursor:zoom-out;transform:scale(1.9);transition:transform .2s}
+.fotos .vazio{color:#6E6E73;font-size:14.5px;text-align:center;padding:24px}
+.fotoNav{display:flex;align-items:center;gap:11px;padding:11px 2px 0}
+.fotoNav button{background:var(--gray);border:0;border-radius:980px;width:34px;height:34px;
+  font-size:17px;color:var(--ink);cursor:pointer;flex:0 0 auto}
+.fotoNav button:hover{background:var(--gray-2)}
+.fotoNav span{font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+.fotoRot{margin-left:auto;font-family:var(--body)!important;font-size:12.5px;
+  color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.criterios{padding:0;display:grid;gap:6px}
+.crit{display:flex;align-items:center;gap:12px;background:var(--wt);border:1.5px solid var(--line);
+  border-radius:14px;padding:12px 15px;cursor:pointer;transition:.14s;font-size:15.5px}
+.crit:active{transform:scale(.99)}
+.crit .tecla{width:24px;height:24px;border-radius:7px;background:var(--gray);color:var(--ink-3);
+  font:600 12px/1 var(--mono);display:grid;place-items:center;flex:0 0 auto}
+.crit .nome{flex:1}
+.crit .estado{font-size:13px;font-weight:600;color:var(--ink-3);flex:0 0 auto}
+.crit.sim{border-color:var(--green);background:var(--green-bg)}
+.crit.sim .estado{color:var(--green)}
+.crit.sim .tecla{background:var(--green);color:var(--wt)}
+.crit.nao{border-color:var(--red);background:var(--red-bg)}
+.crit.nao .estado{color:var(--red)}
+.crit.nao .tecla{background:var(--red);color:var(--wt)}
+.crit.bonus{border-style:dashed}
+
+.obsBox{margin:0}
+.obsBox textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px 15px;
+  font-size:15px;resize:vertical;min-height:64px}
+.obsBox textarea:focus{outline:0;border-color:var(--green)}
+
+.acoes{display:flex;gap:9px}
+.acoes button{flex:1;border:0;border-radius:14px;padding:15px;font-size:16px;font-weight:600;
+  font-family:var(--body);cursor:pointer;letter-spacing:-.01em}
+.btnOk{background:var(--green);color:var(--wt)}
+.btnSec{background:var(--gray);color:var(--ink);flex:0 0 auto;padding:15px 18px}
+.btnAusente{background:var(--amber-bg);color:var(--amber);flex:0 0 auto;padding:15px 18px}
+
+/* ---------- configurações ---------- */
+.campo{margin-bottom:16px}
+.campo label{display:block;font-size:13.5px;font-weight:600;margin-bottom:6px}
+.campo input,.campo select{width:100%;border:1.5px solid var(--line);border-radius:13px;
+  padding:13px 15px;font-size:16px}
+.campo input:focus,.campo select:focus{outline:0;border-color:var(--green)}
+.campo small{display:block;font-size:12.5px;color:var(--ink-3);margin-top:5px;line-height:1.45}
+.oculto{-webkit-text-security:disc;text-security:disc}
+.btnFull{display:block;width:100%;border:0;background:var(--green);color:var(--wt);font-family:var(--body);
+  font-size:17px;font-weight:600;padding:16px;border-radius:16px;cursor:pointer;margin-top:4px}
+.btnFull.alt{background:var(--gray);color:var(--ink)}
+
+/* ---------- resumo ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:16px 0}
+.kpi{background:var(--gray);border-radius:14px;padding:14px 16px}
+.kpi b{display:block;font-size:27px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.kpi span{font-size:12.5px;color:var(--ink-2);display:block;margin-top:4px}
+.kpi.bom b{color:var(--green)} .kpi.ruim b{color:var(--red)} .kpi.meio b{color:var(--amber)}
+
+.ponte{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-2);
+  padding:9px 26px;border-bottom:1px solid var(--gray-2)}
+.luz{width:9px;height:9px;border-radius:50%;background:var(--line);flex:0 0 auto}
+.luz.on{background:var(--green-l);box-shadow:0 0 0 3px rgba(62,207,90,.2)}
+.luz.erro{background:var(--red)}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);
+  color:var(--wt);padding:13px 20px;border-radius:14px;font-size:14.5px;z-index:100;
+  box-shadow:var(--sh);max-width:86vw;text-align:center}
+.toast[hidden]{display:none}
+</style>
+</head>
+<body>
+
+<div class="appbar">
+  <button class="back" id="back" aria-label="Voltar">‹</button>
+  <div class="ttl">Avaliação <span class="dir">Direct</span></div>
+</div>
+
+<!-- ============ MENU INICIAL ============ -->
+<div class="view on" id="v-menu">
+  <div class="menu">
+    <p class="menu-eyebrow">Direct Internet · Estoque</p>
+    <h1 class="menu-h1">O que você vai fazer agora?</h1>
+
+    <button class="big" data-go="carregar">Avaliar ocorrências
+      <small id="mResumo">Carregue o relatório de finalizadas</small></button>
+
+    <button class="big alt" data-go="historico">Ver o que já foi avaliado
+      <small>Notas por técnico e o que mais falta nas ordens</small></button>
+
+    <button class="instbtn" data-go="config">Configurações</button>
+
+    <p class="menu-foot">Documento interno · não compartilhar com o cliente</p>
+    <div class="assin">
+      <span class="av">DS</span>
+      <span class="at"><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></span>
+    </div>
+    <p class="versao">versão 2 · para computador</p>
+  </div>
+</div>
+
+<!-- ============ CARREGAR ============ -->
+<div class="view" id="v-carregar">
+  <div class="hero"><div class="in">
+    <p class="eyebrow">Passo 1</p>
+    <h1>Relatório de<br>ordens finalizadas</h1>
+  </div></div>
+  <div class="container">
+    <div class="drop" id="drop">
+      <b>Solte a planilha aqui</b>
+      <small>.xlsx ou .csv exportado do HubSoft</small>
+    </div>
+    <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" hidden>
+
+    <div class="note" style="margin-top:16px">
+      <b>De onde vem esse arquivo</b>
+      No HubSoft, em Ordens de Serviço, filtre pelo período e situação
+      <i>Executada</i>, depois exporte em Excel.
+    </div>
+
+    <div id="carregado"></div>
+  </div>
+</div>
+
+<!-- ============ LISTA ============ -->
+<div class="view" id="v-lista">
+  <div class="hero"><div class="in">
+    <p class="eyebrow" id="listaEyebrow">Passo 2</p>
+    <h1>O que falta avaliar</h1>
+  </div></div>
+  <div class="container">
+    <div class="kpis" id="listaKpis"></div>
+    <button class="btnFull" id="btnComecar">Começar pela primeira pendente</button>
+    <h2>Todas as ordens</h2>
+    <div id="listaOrdens"></div>
+  </div>
+</div>
+
+<!-- ============ AVALIAÇÃO ============ -->
+<div class="view" id="v-aval">
+  <div class="ponte"><span class="luz" id="luz"></span><span id="ponteTxt">Procurando a ponte…</span></div>
+  <div class="avalCab">
+    <button class="btnIndice" id="btnIndice" title="Ver todas as ordens">☰</button>
+    <div class="avalProg"><i id="prog"></i></div>
+    <span class="avalConta" id="conta">0 / 0</span>
+    <span class="avalNota" id="nota">5</span>
+  </div>
+  <div class="indice" id="indice" hidden></div>
+
+  <div class="avalGrade">
+
+    <!-- coluna esquerda: a foto ocupa o espaço que merece -->
+    <div class="colFoto">
+      <div class="fotos" id="aFotos"><div class="vazio">sem fotos</div></div>
+      <div class="fotoNav" id="aFotoNav" hidden>
+        <button id="fotoAnt" title="seta esquerda">‹</button>
+        <span id="fotoConta">1 / 1</span>
+        <button id="fotoProx" title="seta direita">›</button>
+        <span class="fotoRot" id="fotoRot"></span>
+      </div>
+    </div>
+
+    <!-- coluna direita: o que se marca com o teclado -->
+    <div class="colLado">
+      <div class="cliente">
+        <h3 id="aCliente">—</h3>
+        <div class="meta" id="aMeta"></div>
+      </div>
+
+      <div class="descr" id="aAbertura" hidden><b>Abertura</b><span></span></div>
+      <div class="descr" id="aFechamento" hidden><b>Encerramento</b><span></span></div>
+
+      <div class="criterios" id="aCriterios"></div>
+
+      <div class="obsBox"><textarea id="aObs" placeholder="Observações (opcional)"></textarea></div>
+
+      <div class="acoes">
+        <button class="btnSec" id="btnVoltar" title="Backspace">‹ Voltar</button>
+        <button class="btnAusente" id="btnAusente" title="tecla 0">Cliente ausente</button>
+        <button class="btnOk" id="btnConcluir" title="Enter">Concluir e avançar</button>
+      </div>
+      <p class="atalhos">
+        <b>1</b>–<b>9</b> critérios · <b>0</b> ausente ·
+        <b>←</b><b>→</b> foto · <b>Enter</b> avança · <b>Backspace</b> volta
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HISTÓRICO ============ -->
+<div class="view" id="v-historico">
+  <div class="hero"><div class="in">
+    <p class="eyebrow">Produtividade</p>
+    <h1>O que já foi<br>avaliado</h1>
+  </div></div>
+  <div class="container" id="histCorpo">
+    <p class="note alerta"><b>Requer a planilha</b>Configure a URL do Apps Script em Configurações.</p>
+  </div>
+</div>
+
+<!-- ============ CONFIGURAÇÕES ============ -->
+<div class="view" id="v-config">
+  <div class="hero"><div class="in">
+    <p class="eyebrow">Ajustes</p>
+    <h1>Configurações</h1>
+  </div></div>
+  <div class="container">
+    <div class="campo">
+      <label for="cSync">Planilha de sincronização</label>
+      <input type="text" id="cSync" class="oculto" placeholder="https://script.google.com/…/exec"
+             autocomplete="off" spellcheck="false">
+      <small>URL do Apps Script publicado. É onde as avaliações são gravadas.</small>
+    </div>
+    <div class="campo">
+      <label for="cSegredo">Senha da planilha</label>
+      <input type="text" id="cSegredo" class="oculto" placeholder="opcional"
+             autocomplete="off" spellcheck="false">
+    </div>
+    <div class="campo">
+      <label for="cPonte">Endereço da ponte</label>
+      <input type="text" id="cPonte" placeholder="http://localhost:8765" autocomplete="off" spellcheck="false">
+      <small>Programa local que busca as fotos no HubSoft. Deixe em branco para avaliar só pelas descrições.</small>
+    </div>
+    <div class="campo">
+      <label for="cNome">Seu nome</label>
+      <input type="text" id="cNome" placeholder="quem está avaliando" autocomplete="off">
+    </div>
+    <button class="btnFull" id="btnSalvarCfg">Salvar</button>
+    <button class="btnFull alt" id="btnTestar" style="margin-top:9px">Testar a planilha</button>
+    <p class="note" id="cfgStatus" style="margin-top:16px" hidden></p>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = t => String(t == null ? '' : t)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ===========================================================
+   Critérios e pontuação
+
+   Reproduz a fórmula da planilha do setor: parte de 5 pontos,
+   cada critério marcado como NÃO desconta o peso dele, e a
+   avaliação do cliente soma 2 quando marcada como SIM.
+   Critério em branco não desconta — a ordem não exigia aquilo.
+   =========================================================== */
+const CRITERIOS = [
+  {id:'sinal_interno', rotulo:'Sinal interno',        peso:1, tecla:'1'},
+  {id:'sinal_externo', rotulo:'Sinal externo',        peso:1, tecla:'2'},
+  {id:'cadastro',      rotulo:'Atualizou cadastro',   peso:2, tecla:'3'},
+  {id:'mac_antigo',    rotulo:'MAC antigo',           peso:1, tecla:'4'},
+  {id:'mac_novo',      rotulo:'MAC novo',             peso:1, tecla:'5'},
+  {id:'velocidade',    rotulo:'Teste de velocidade',  peso:1, tecla:'6'},
+  {id:'problema',      rotulo:'Foto do problema',     peso:1, tecla:'7'},
+  {id:'cto',           rotulo:'Mexeu na CTO',         peso:1, tecla:'8'},
+  {id:'avaliacao',     rotulo:'Avaliação do cliente', peso:0, tecla:'9', bonus:true}
+];
+
+function calcularNota(m){
+  if(m.ausente) return null;
+  let n = 5;
+  CRITERIOS.forEach(c=>{
+    if(c.bonus){ if(m[c.id] === 'sim') n += 2; }
+    else if(m[c.id] === 'nao') n -= c.peso;
+  });
+  return n;
+}
+
+/* ---------- estado ---------- */
+let cfg = {sync:'', segredo:'', ponte:'http://localhost:8765', nome:''};
+let fila = [], idx = 0, fotoIdx = 0;
+let marcas = {};                 // marcações da ordem atual
+let avaliacoes = [];             // o que foi concluído nesta sessão
+let jaAvaliadas = new Set();     // OS que já constam na planilha
+let ponteViva = false;
+
+const K = 'avaliador:cfg';
+const KA = 'avaliador:fila';
+
+function aviso(t, ms){
+  const el = $('#toast');
+  el.textContent = t; el.hidden = false;
+  clearTimeout(aviso._t);
+  aviso._t = setTimeout(()=> el.hidden = true, ms || 3200);
+}
+
+/* ===========================================================
+   Navegação por hash, como no manual dos equipamentos
+   =========================================================== */
+const TELAS = {
+  menu:      {titulo:'Avaliação'},
+  carregar:  {titulo:'Carregar relatório'},
+  lista:     {titulo:'Ordens'},
+  aval:      {titulo:'Avaliando'},
+  historico: {titulo:'Produtividade'},
+  config:    {titulo:'Configurações'},
+};
+
+function irPara(nome){
+  if(!TELAS[nome]) nome = 'menu';
+  $$('.view').forEach(v => v.classList.remove('on'));
+  const alvo = $('#v-' + nome);
+  if(alvo) alvo.classList.add('on');
+  $('#back').classList.toggle('on', nome !== 'menu');
+  window.scrollTo(0, 0);
+
+  if(nome === 'lista') desenharLista();
+  if(nome === 'aval') mostrarOrdem();
+  if(nome === 'historico') carregarHistorico();
+  if(nome === 'config') escreverConfig();
+}
+
+addEventListener('hashchange', ()=> irPara(location.hash.slice(1)));
+document.addEventListener('click', e=>{
+  const b = e.target.closest && e.target.closest('[data-go]');
+  if(b) location.hash = '#' + b.dataset.go;
+});
+$('#back').onclick = ()=>{
+  const atual = location.hash.slice(1);
+  location.hash = (atual === 'aval') ? '#lista' : '#menu';
+};
+
+/* ===========================================================
+   Leitura do relatório
+   =========================================================== */
+const norm = s => String(s == null ? '' : s).normalize('NFD')
+  .replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+
+const COLUNAS = {
+  os:         ['numero os','num o s','n o s','os','numero','codigo os'],
+  cliente:    ['cliente','nome cliente','razao social'],
+  tipo:       ['tipo os','tipo o s','tipo servico','tipo de o s','servico'],
+  tecnico:    ['tecnico','tecnicos','responsavel','executado por'],
+  data:       ['data termino executado','data execucao','data fim executado',
+               'data termino','data finalizacao','termino executado','data'],
+  status:     ['status','situacao','situacao os','status os'],
+  abertura:   ['descricao os','descricao servico','descricao abertura','motivo'],
+  fechamento: ['descricao fechamento','fechamento','conclusao','descricao encerramento',
+               'descricao de encerramento','parecer'],
+  contrato:   ['contrato','codigo cliente','id cliente'],
+  plano:      ['plano','servico contratado'],
+  endereco:   ['endereco','endereco instalacao','logradouro'],
+  hIni:       ['hora inicio','data inicio executado','inicio executado','h inicio'],
+  hFim:       ['hora fechamento','hora termino','h fechamento'],
+};
+
+/* Casa o cabeçalho com os nomes conhecidos. A comparação por palavras
+   cobre as preposições que o HubSoft insere: "Data de Término
+   Executado" casa com "data termino executado". */
+function acharColuna(cabecalho, chaves){
+  const n = cabecalho.map(norm);
+  let i = n.findIndex(h => chaves.includes(h));
+  if(i >= 0) return i;
+  i = n.findIndex(h => chaves.some(c => h.includes(c)));
+  if(i >= 0) return i;
+  return n.findIndex(h=>{
+    const p = h.split(' ').filter(x => x.length > 2 && !['de','da','do'].includes(x));
+    return chaves.some(c=>{
+      const alvo = c.split(' ').filter(x => x.length > 2);
+      return alvo.length > 1 && alvo.every(x => p.includes(x));
+    });
+  });
+}
+
+async function lerArquivo(file){
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, {type:'array', cellDates:true});
+  const aoa = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, defval:''});
+  if(aoa.length < 2){ aviso('A planilha está vazia.'); return; }
+
+  const cab = aoa[0].map(x => String(x || ''));
+  const col = {};
+  Object.entries(COLUNAS).forEach(([k, chaves])=>{ col[k] = acharColuna(cab, chaves); });
+
+  if(col.os < 0){ aviso('Não achei a coluna do número da OS.'); return; }
+
+  const pega = (linha, k) => col[k] >= 0 ? String(linha[col[k]] ?? '').trim() : '';
+  const FECHADA = /execut|conclu|final|fechad|cancel|realizad/i;
+
+  fila = aoa.slice(1).map(l=>{
+    const os = pega(l, 'os');
+    if(!os || os === '-') return null;
+    return {
+      os, cliente: pega(l,'cliente'), tipo: pega(l,'tipo'), tecnico: pega(l,'tecnico'),
+      data: soData(pega(l,'data')), status: pega(l,'status'),
+      abertura: pega(l,'abertura'), fechamento: pega(l,'fechamento'),
+      contrato: pega(l,'contrato'), plano: pega(l,'plano'), endereco: pega(l,'endereco'),
+      hIni: soHora(pega(l,'hIni')), hFim: soHora(pega(l,'hFim')),
+      fotos: [], buscou: false,
+    };
+  }).filter(Boolean);
+
+  const fechadas = fila.filter(o => FECHADA.test(o.status) || o.data).length;
+  const total = fila.length;
+
+  $('#carregado').innerHTML = `
+    <div class="note" style="margin-top:16px">
+      <b>${total} ordens lidas</b>
+      ${fechadas} com situação de encerrada${col.fechamento < 0
+        ? '<br><b style="color:var(--amber)">A coluna de encerramento não foi reconhecida</b>' : ''}
+    </div>
+    <button class="btnFull" style="margin-top:14px" data-go="lista">Ver o que falta avaliar</button>`;
+
+  guardar();
+  await conferirPlanilha();
+  aviso(total + ' ordens carregadas.');
+}
+
+const soData = t => (String(t||'').match(/(\d{2}\/\d{2}\/\d{4})/) || [,''])[1] ||
+  (String(t||'').match(/(\d{4}-\d{2}-\d{2})/) ? String(t).slice(0,10).split('-').reverse().join('/') : '');
+const soHora = t => (String(t||'').match(/(\d{2}:\d{2})/) || [,''])[1];
+
+/* ---------- arquivo: soltar ou escolher ---------- */
+const drop = $('#drop');
+drop.onclick = ()=> $('#arquivo').click();
+$('#arquivo').onchange = e => { if(e.target.files[0]) lerArquivo(e.target.files[0]); };
+['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{
+  e.preventDefault(); drop.classList.add('sobre');
+}));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{
+  e.preventDefault(); drop.classList.remove('sobre');
+}));
+drop.addEventListener('drop', e=>{
+  const f = e.dataTransfer.files[0];
+  if(f) lerArquivo(f);
+});
+
+/* ===========================================================
+   Lista de ordens
+   =========================================================== */
+function pendentes(){ return fila.filter(o => !jaAvaliadas.has(String(o.os))); }
+
+function desenharLista(){
+  if(!fila.length){
+    $('#listaKpis').innerHTML = '';
+    $('#listaOrdens').innerHTML = '<p class="note alerta"><b>Nada carregado</b>Volte e solte o relatório de finalizadas.</p>';
+    $('#btnComecar').hidden = true;
+    return;
+  }
+  const pend = pendentes();
+  const canceladas = fila.filter(o => /cancel/i.test(o.status)).length;
+
+  $('#listaKpis').innerHTML = `
+    <div class="kpi ${pend.length ? 'meio' : 'bom'}"><b>${pend.length}</b><span>para avaliar</span></div>
+    <div class="kpi bom"><b>${fila.length - pend.length}</b><span>já avaliadas</span></div>
+    ${canceladas ? `<div class="kpi"><b>${canceladas}</b><span>canceladas</span></div>` : ''}`;
+
+  $('#btnComecar').hidden = !pend.length;
+  $('#btnComecar').textContent = pend.length
+    ? 'Avaliar as ' + pend.length + ' pendentes' : 'Tudo avaliado';
+
+  $('#listaOrdens').innerHTML = fila.map((o,i)=>{
+    const feita = avaliacoes.find(a => a.os === o.os);
+    const naPlanilha = jaAvaliadas.has(String(o.os));
+    const nota = feita ? (feita.nota === null ? '—' : feita.nota) : (naPlanilha ? '✓' : '');
+    const baixa = feita && feita.nota !== null && feita.nota <= 3;
+    return `<button class="tile ${feita || naPlanilha ? 'feita' : ''} ${baixa ? 'baixa' : ''}" data-ordem="${i}">
+      <span class="ic">${nota || (i+1)}</span>
+      <span><b>${esc(o.cliente || 'sem nome')}</b>
+        <small>OS ${esc(o.os)}${o.tipo ? ' · ' + esc(o.tipo) : ''}${o.data ? ' · ' + esc(o.data) : ''}</small></span>
+      <span class="arrow">›</span>
+    </button>`;
+  }).join('');
+
+  $$('#listaOrdens [data-ordem]').forEach(b => b.onclick = ()=>{
+    idx = +b.dataset.ordem;
+    location.hash = '#aval';
+  });
+}
+
+$('#btnComecar').onclick = ()=>{
+  const p = fila.findIndex(o => !jaAvaliadas.has(String(o.os)));
+  idx = p >= 0 ? p : 0;
+  location.hash = '#aval';
+};
+
+/* ===========================================================
+   Tela de avaliação
+   =========================================================== */
+function ordemAtual(){ return fila[idx]; }
+
+function mostrarOrdem(){
+  const o = ordemAtual();
+  if(!o){ location.hash = '#lista'; return; }
+
+  fotoIdx = 0;
+  const feita = avaliacoes.find(a => a.os === o.os);
+  marcas = {};
+  if(feita){
+    CRITERIOS.forEach(c=>{
+      const v = feita[c.id];
+      if(v === 'SIM') marcas[c.id] = 'sim';
+      else if(v === 'NÃO') marcas[c.id] = 'nao';
+    });
+    marcas.ausente = !!feita.ausente;
+    $('#aObs').value = feita.obs || '';
+  } else {
+    $('#aObs').value = '';
+  }
+
+  $('#aCliente').textContent = o.cliente || 'sem nome';
+  $('#aMeta').innerHTML = [
+    'OS ' + esc(o.os), o.tipo && esc(o.tipo), o.tecnico && esc(o.tecnico),
+    o.data && esc(o.data) + (o.hIni ? ' · ' + esc(o.hIni) : '') + (o.hFim ? ' às ' + esc(o.hFim) : ''),
+    o.endereco && esc(o.endereco),
+  ].filter(Boolean).join('<br>');
+
+  mostrarDescricao('#aAbertura', o.abertura);
+  mostrarDescricao('#aFechamento', o.fechamento);
+
+  $('#conta').textContent = (idx + 1) + ' / ' + fila.length;
+  $('#prog').style.width = Math.round((idx + 1) / fila.length * 100) + '%';
+
+  desenharCriterios();
+  mostrarFoto();
+  buscarFotos(o);
+}
+
+function mostrarDescricao(sel, txt){
+  const el = $(sel);
+  if(!txt){ el.hidden = true; return; }
+  el.querySelector('span').textContent = txt;
+  el.hidden = false;
+}
+
+function desenharCriterios(){
+  $('#aCriterios').innerHTML = CRITERIOS.map(c=>{
+    const e = marcas[c.id];
+    const rotulo = e === 'sim' ? 'sim' : e === 'nao' ? 'não' : '—';
+    return `<button class="crit ${e || ''} ${c.bonus ? 'bonus' : ''}" data-crit="${c.id}">
+      <span class="tecla">${c.tecla}</span>
+      <span class="nome">${esc(c.rotulo)}${c.bonus ? ' <small style="color:var(--ink-3)">+2</small>' : ''}</span>
+      <span class="estado">${rotulo}</span>
+    </button>`;
+  }).join('');
+
+  $$('#aCriterios [data-crit]').forEach(b => b.onclick = ()=> alternar(b.dataset.crit));
+
+  const n = calcularNota(marcas);
+  const el = $('#nota');
+  el.textContent = n === null ? '—' : n;
+  el.className = 'avalNota' + (n === null ? '' : n <= 3 ? ' baixa' : n < 5 ? ' media' : '');
+  $('#btnAusente').style.background = marcas.ausente ? 'var(--amber)' : '';
+  $('#btnAusente').style.color = marcas.ausente ? 'var(--wt)' : '';
+}
+
+/* branco → sim → não → branco. Em branco não desconta. */
+function alternar(id){
+  const e = marcas[id];
+  marcas[id] = e === undefined ? 'sim' : e === 'sim' ? 'nao' : undefined;
+  if(marcas[id] === undefined) delete marcas[id];
+  desenharCriterios();
+}
+
+$('#btnAusente').onclick = ()=>{ marcas.ausente = !marcas.ausente; desenharCriterios(); };
+
+/* ---------- fotos ---------- */
+function mostrarFoto(){
+  const o = ordemAtual();
+  const cx = $('#aFotos');
+  if(!o.fotos.length){
+    cx.innerHTML = `<div class="vazio">${o.buscou ? 'sem fotos nesta ordem'
+      : (ponteViva ? 'buscando no HubSoft…' : 'ponte desligada — avaliando pelas descrições')}</div>`;
+    $('#aFotoNav').hidden = true;
+    return;
+  }
+  const f = o.fotos[fotoIdx] || o.fotos[0];
+  cx.innerHTML = `<img src="${esc(f.url)}" alt="" loading="lazy"
+    onerror="this.parentElement.innerHTML='<div class=\\'vazio\\'>não consegui carregar esta foto</div>'">`;
+  // clicar amplia: etiquetas de MAC costumam exigir
+  const img = cx.querySelector('img');
+  if(img) img.onclick = ()=> img.classList.toggle('zoom');
+  $('#aFotoNav').hidden = false;
+  $('#fotoConta').textContent = (fotoIdx + 1) + ' / ' + o.fotos.length;
+  $('#fotoRot').textContent = f.rotulo || '';
+}
+
+$('#fotoAnt').onclick = ()=>{
+  const o = ordemAtual();
+  fotoIdx = (fotoIdx - 1 + o.fotos.length) % o.fotos.length;
+  mostrarFoto();
+};
+$('#fotoProx').onclick = ()=>{
+  const o = ordemAtual();
+  fotoIdx = (fotoIdx + 1) % o.fotos.length;
+  mostrarFoto();
+};
+
+async function buscarFotos(o){
+  if(!ponteViva || o.buscou) return;
+  try{
+    const r = await fetch(cfg.ponte + '/fotos?os=' + encodeURIComponent(o.os),
+                          {signal: AbortSignal.timeout(40000)});
+    const j = await r.json();
+    if(j.aguarde) return;
+    o.fotos = (j.fotos || []).map(f => typeof f === 'string' ? {url:f} : f);
+    o.buscou = true;
+    if(ordemAtual() === o) mostrarFoto();
+  }catch(e){ o.buscou = true; }
+}
+
+/* ---------- concluir ---------- */
+function registrar(){
+  const o = ordemAtual();
+  const linha = {
+    os: o.os, cliente: o.cliente, tecnico: o.tecnico, tipo: o.tipo, data: o.data,
+    hIni: o.hIni, hFim: o.hFim, obs: $('#aObs').value.trim(),
+    ausente: !!marcas.ausente, nota: calcularNota(marcas),
+  };
+  CRITERIOS.forEach(c=>{
+    linha[c.id] = marcas[c.id] === 'sim' ? 'SIM' : marcas[c.id] === 'nao' ? 'NÃO' : '';
+  });
+
+  const i = avaliacoes.findIndex(a => a.os === o.os);
+  if(i >= 0) avaliacoes[i] = linha; else avaliacoes.push(linha);
+  jaAvaliadas.add(String(o.os));
+  guardar();
+  return linha;
+}
+
+async function concluir(){
+  const linha = registrar();
+  enviarUma(linha);
+
+  const prox = fila.findIndex((o,i) => i > idx && !jaAvaliadas.has(String(o.os)));
+  if(prox >= 0){ idx = prox; mostrarOrdem(); }
+  else if(idx < fila.length - 1){ idx++; mostrarOrdem(); }
+  else {
+    aviso('Fila concluída.');
+    location.hash = '#lista';
+  }
+}
+
+$('#btnIndice').onclick = alternarIndice;
+$('#btnConcluir').onclick = concluir;
+$('#btnVoltar').onclick = ()=>{
+  if(idx <= 0) return;
+  registrar();
+  idx--;
+  mostrarOrdem();
+};
+
+addEventListener('keydown', e=>{
+  if(!$('#v-aval').classList.contains('on')) return;
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+
+  const c = CRITERIOS.find(x => x.tecla === e.key);
+  if(c){ e.preventDefault(); alternar(c.id); return; }
+  if(e.key === '0'){ e.preventDefault(); $('#btnAusente').click(); return; }
+  if(e.key === 'Enter'){ e.preventDefault(); concluir(); return; }
+  if(e.key === 'Backspace'){ e.preventDefault(); $('#btnVoltar').click(); return; }
+  if(e.key === 'ArrowRight' && ordemAtual().fotos.length > 1){ e.preventDefault(); $('#fotoProx').click(); }
+  if(e.key === 'ArrowLeft' && ordemAtual().fotos.length > 1){ e.preventDefault(); $('#fotoAnt').click(); }
+});
+
+/* ===========================================================
+   Planilha
+   =========================================================== */
+function syncLigado(){ return !!(cfg.sync || '').trim(); }
+
+async function syncChamar(params){
+  const u = new URL(cfg.sync);
+  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
+  if(cfg.segredo) u.searchParams.set('segredo', cfg.segredo);
+  const r = await fetch(u.toString(), {signal: AbortSignal.timeout(30000)});
+  return r.json();
+}
+
+async function syncEnviar(corpo){
+  const r = await fetch(cfg.sync, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(Object.assign({segredo: cfg.segredo || ''}, corpo)),
+    signal: AbortSignal.timeout(40000),
+  });
+  return r.json();
+}
+
+async function enviarUma(linha){
+  if(!syncLigado()) return;
+  try{
+    await syncEnviar({avaliacoes:[linha], usuario: cfg.nome || ''});
+    linha._salva = true;
+  }catch(e){
+    linha._salva = false;
+    aviso('Não consegui gravar a OS ' + linha.os + ' na planilha.');
+  }
+}
+
+async function conferirPlanilha(){
+  if(!syncLigado()) return;
+  try{
+    const r = await syncChamar({acao:'avaliacoes', dias:0});
+    jaAvaliadas = new Set((r.avaliacoes || []).map(a => String(a.os)));
+    atualizarMenu();
+  }catch(e){ /* segue sem o cruzamento */ }
+}
+
+/* Índice de ordens: no computador, saltar com o mouse é mais rápido
+   do que avançar uma a uma. */
+function alternarIndice(){
+  const el = $('#indice');
+  if(!el.hidden){ el.hidden = true; return; }
+  el.innerHTML = fila.map((o,i)=>{
+    const feita = avaliacoes.find(a => a.os === o.os);
+    const naPlanilha = jaAvaliadas.has(String(o.os));
+    const nota = feita ? (feita.nota === null ? '—' : feita.nota) : (naPlanilha ? '✓' : '');
+    return `<button class="idx ${i === idx ? 'atual' : ''} ${feita || naPlanilha ? 'feita' : ''}"
+      data-ir="${i}">
+      <span class="idxN">${i + 1}</span>
+      <span class="idxNome">${esc(o.cliente || o.os)}</span>
+      ${nota ? `<span class="idxNota">${nota}</span>` : ''}
+    </button>`;
+  }).join('');
+  el.hidden = false;
+  $$('#indice [data-ir]').forEach(b => b.onclick = ()=>{
+    registrar();
+    idx = +b.dataset.ir;
+    el.hidden = true;
+    mostrarOrdem();
+  });
+}
+
+/* ---------- histórico ---------- */
+async function carregarHistorico(){
+  const alvo = $('#histCorpo');
+  if(!syncLigado()){
+    alvo.innerHTML = '<p class="note alerta"><b>Requer a planilha</b>Configure a URL do Apps Script em Configurações.</p>';
+    return;
+  }
+  alvo.innerHTML = '<p class="note">Lendo a planilha…</p>';
+  try{
+    const r = await syncChamar({acao:'avaliacoes', dias:0});
+    const a = r.avaliacoes || [];
+    if(!a.length){
+      alvo.innerHTML = '<p class="note alerta"><b>Nada gravado ainda</b>Avalie as ordens para alimentar esta análise.</p>';
+      return;
+    }
+    const comNota = a.filter(x => x.pontos !== null && x.pontos !== '' && x.pontos !== undefined);
+    const media = comNota.length ? comNota.reduce((s,x)=>s+Number(x.pontos),0) / comNota.length : 0;
+
+    const porTec = {};
+    a.forEach(x=>{
+      const t = x.tecnico || 'sem técnico';
+      const o = porTec[t] = porTec[t] || {n:0, soma:0, baixas:0};
+      if(x.pontos !== null && x.pontos !== ''){
+        o.n++; o.soma += Number(x.pontos);
+        if(Number(x.pontos) <= 3) o.baixas++;
+      }
+    });
+    const tecnicos = Object.entries(porTec).filter(([,o]) => o.n)
+      .map(([t,o]) => ({nome:t, media:o.soma/o.n, n:o.n, baixas:o.baixas}))
+      .sort((x,y) => y.media - x.media);
+
+    const falhas = {};
+    const nomes = {}; CRITERIOS.forEach(c => nomes[c.id] = c.rotulo);
+    a.forEach(x=>{
+      Object.entries(x.criterios || {}).forEach(([k,v])=>{
+        if(String(v).toUpperCase() === 'NÃO') falhas[k] = (falhas[k]||0) + 1;
+      });
+    });
+    const criticos = Object.entries(falhas).sort((x,y) => y[1]-x[1]).slice(0,6);
+
+    alvo.innerHTML = `
+      <div class="kpis">
+        <div class="kpi"><b>${a.length}</b><span>avaliadas</span></div>
+        <div class="kpi ${media < 4 ? 'ruim' : media < 4.5 ? 'meio' : 'bom'}">
+          <b>${media.toFixed(1)}</b><span>nota média</span></div>
+        <div class="kpi"><b>${tecnicos.length}</b><span>técnicos</span></div>
+      </div>
+
+      <h2>Por técnico</h2>
+      ${tecnicos.map(t=>`
+        <button class="tile">
+          <span class="ic" style="background:${t.media < 4 ? 'var(--red-bg)' : t.media < 4.5
+            ? 'var(--amber-bg)' : 'var(--green-bg)'};color:${t.media < 4 ? 'var(--red)'
+            : t.media < 4.5 ? 'var(--amber)' : 'var(--green)'}">${t.media.toFixed(1)}</span>
+          <span><b>${esc(t.nome)}</b><small>${t.n} ordens${t.baixas ? ' · ' + t.baixas + ' com nota baixa' : ''}</small></span>
+        </button>`).join('')}
+
+      ${criticos.length ? `<h2>O que mais falta nas ordens</h2>
+      ${criticos.map(([k,v])=>`
+        <button class="tile"><span class="ic">${v}</span>
+          <span><b>${esc(nomes[k] || k)}</b><small>marcado como não cumprido</small></span>
+        </button>`).join('')}` : ''}`;
+  }catch(e){
+    alvo.innerHTML = '<p class="note erro"><b>Não consegui ler a planilha</b>' + esc(e.message) + '</p>';
+  }
+}
+
+/* ===========================================================
+   Ponte e configurações
+   =========================================================== */
+async function checarPonte(){
+  if(!cfg.ponte){ mostrarPonte(false, 'Avaliação pelas descrições'); return; }
+  try{
+    const r = await fetch(cfg.ponte + '/status', {signal: AbortSignal.timeout(2500)});
+    const j = await r.json();
+    ponteViva = !!j.pronto;
+    mostrarPonte(j.pronto, j.pronto ? 'Ponte conectada ao HubSoft'
+      : (j.erro || 'Ponte iniciando…'));
+  }catch(e){
+    ponteViva = false;
+    mostrarPonte(false, 'Ponte desligada — avaliando pelas descrições');
+  }
+}
+
+function mostrarPonte(ok, txt){
+  $('#luz').className = 'luz' + (ok ? ' on' : '');
+  $('#ponteTxt').textContent = txt;
+}
+
+function escreverConfig(){
+  $('#cSync').value = cfg.sync || '';
+  $('#cSegredo').value = cfg.segredo || '';
+  $('#cPonte').value = cfg.ponte || '';
+  $('#cNome').value = cfg.nome || '';
+}
+
+$('#btnSalvarCfg').onclick = ()=>{
+  const url = $('#cSync').value.trim();
+  if(url && !/^https:\/\/script\.google\.com\/.*\/exec/.test(url)){
+    mostrarCfg('A URL da planilha deve terminar em /exec.', 'erro');
+    return;
+  }
+  cfg.sync = url;
+  cfg.segredo = $('#cSegredo').value.trim();
+  cfg.ponte = $('#cPonte').value.trim();
+  cfg.nome = $('#cNome').value.trim();
+  localStorage.setItem(K, JSON.stringify(cfg));
+  mostrarCfg('Salvo.' + (url ? '' : ' Sem planilha, as avaliações ficam só neste navegador.'), '');
+  checarPonte();
+  conferirPlanilha();
+};
+
+$('#btnTestar').onclick = async ()=>{
+  if(!syncLigado()){ mostrarCfg('Preencha a URL da planilha primeiro.', 'alerta'); return; }
+  mostrarCfg('Testando…', '');
+  try{
+    const r = await syncChamar({acao:'ping'});
+    mostrarCfg(r.ok ? 'A planilha respondeu. Tudo certo.'
+                    : ('A planilha recusou: ' + (r.erro || '')), r.ok ? '' : 'erro');
+  }catch(e){ mostrarCfg('Não consegui falar com a planilha: ' + e.message, 'erro'); }
+};
+
+function mostrarCfg(txt, classe){
+  const el = $('#cfgStatus');
+  el.textContent = txt;
+  el.className = 'note' + (classe ? ' ' + classe : '');
+  el.hidden = false;
+}
+
+/* ---------- memória local ---------- */
+function guardar(){
+  try{
+    localStorage.setItem(KA, JSON.stringify({
+      fila: fila.map(o => Object.assign({}, o, {fotos: []})),
+      avaliacoes, quando: Date.now(),
+    }));
+  }catch(e){ /* cota cheia: segue sem guardar */ }
+}
+
+function recuperar(){
+  try{
+    const c = JSON.parse(localStorage.getItem(K) || 'null');
+    if(c) cfg = Object.assign(cfg, c);
+    const a = JSON.parse(localStorage.getItem(KA) || 'null');
+    if(a && a.fila && Date.now() - a.quando < 7 * 86400000){
+      fila = a.fila;
+      avaliacoes = a.avaliacoes || [];
+      avaliacoes.forEach(x => jaAvaliadas.add(String(x.os)));
+    }
+  }catch(e){ /* começa do zero */ }
+}
+
+function atualizarMenu(){
+  const el = $('#mResumo');
+  if(!fila.length){ el.textContent = 'Carregue o relatório de finalizadas'; return; }
+  const p = pendentes().length;
+  el.textContent = p ? p + (p === 1 ? ' ordem esperando' : ' ordens esperando')
+                     : 'tudo avaliado · ' + fila.length + ' ordens';
+}
+
+/* ---------- início ---------- */
+recuperar();
+atualizarMenu();
+irPara(location.hash.slice(1) || 'menu');
+checarPonte();
+setInterval(checarPonte, 15000);
+conferirPlanilha();
+</script>
+</body>
+</html>
