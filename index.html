@@ -650,20 +650,13 @@ function aviso(t, ms){
 /* ===========================================================
    Navegação por hash, como no manual dos equipamentos
    =========================================================== */
-const TELAS = {
-  menu:      {titulo:'Avaliação'},
-  arquivo:   {titulo:'Arquivo'},
-  lista:     {titulo:'Ordens'},
-  aval:      {titulo:'Avaliando'},
-  painel: {titulo:'Produtividade'},
-  ajustes:   {titulo:'Ajustes'},
-};
+const TELAS = ['capa','arquivo','lista','aval','painel','ajustes'];
 
 const K_TELA = 'avaliador:tela';
 
 function irPara(nome){
   if(!TELAS.includes(nome)) nome = 'capa';
-  $$('.view').forEach(v => v.classList.remove('on'));
+  $$('.tela').forEach(v => v.classList.remove('on'));
   const alvo = $('#t-' + nome);
   if(alvo) alvo.classList.add('on');
 
