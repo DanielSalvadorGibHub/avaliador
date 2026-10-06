@@ -2,478 +2,423 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Avaliação de Ocorrências · Direct</title>
-<meta name="theme-color" content="#03100B">
+<meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-
 :root{
-  /* claro, como o manual dos equipamentos */
-  --bk:#000000;
-  --fundo:#FFFFFF; --v1:#F5F5F7; --v2:#EBEBED;
-  --borda:#D2D2D7; --borda2:#E6E6E9;
-  --txt:#1D1D1F; --txt2:#5A5A5E; --mut:#86868B;
-  --esm1:#146022; --esm2:#1E8A2E; --esm3:#1E8A2E; --esm4:#3ECF5A; --esm5:#EAF6EC;
-  --amb:#9A6700; --amb-bg:#FFF8E6; --erro:#C7362F; --erro-bg:#FBEDEC;
-  --ui:'Inter',-apple-system,'Segoe UI',system-ui,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
-  --sombra:0 2px 6px rgba(0,0,0,.25), 0 14px 40px rgba(0,0,0,.35);
-  --brilho:0 0 28px rgba(47,169,110,.28);
+  --preto:#000; --tinta:#1D1D1F; --tinta2:#6E6E73; --tinta3:#86868B;
+  --branco:#FFF; --cinza:#F5F5F7; --cinza2:#EBEBED; --linha:#D2D2D7;
+  --verde:#1E8A2E; --verde-e:#146022; --verde-c:#34C759; --verde-f:#EAF6EC;
+  --vermelho:#C7362F; --vermelho-f:#FBEDEC;
+  --ambar:#9A6700; --ambar-f:#FFF8E6;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --ui:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;
+  --sombra:0 1px 3px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.07);
+  --barra:50px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:var(--ui);font-size:14px;color:var(--txt);
-  background:var(--fundo);-webkit-font-smoothing:antialiased;letter-spacing:-.008em}
-button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
-button{cursor:pointer;border:0;background:none}
+html,body{margin:0;padding:0;height:100%}
+body{font:16px/1.5 var(--ui);background:var(--branco);color:var(--tinta);
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,select,textarea{font-family:inherit}
+h1,h2,h3,h4,p{margin:0}
 @keyframes surge{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes girar{to{transform:rotate(360deg)}}
-@keyframes respira{to{opacity:.6}}
 
-.btn{width:100%;background:linear-gradient(180deg,var(--esm2),var(--esm3));color:#03150D;
-  border-radius:14px;padding:12px 16px;font-size:14px;font-weight:500;letter-spacing:-.01em;
-  box-shadow:0 1px 0 rgba(255,255,255,.25) inset, 0 6px 20px rgba(47,169,110,.26);transition:.16s}
-.btn:hover{filter:brightness(1.07)}
-.btn:active{transform:translateY(1px)}
-.btn:disabled{opacity:.35;cursor:not-allowed;filter:none;transform:none}
-.btn.ghost{background:var(--v1);color:var(--txt);box-shadow:inset 0 0 0 1px var(--borda2);font-weight:450}
-.btn.ghost:hover{background:var(--v2);box-shadow:inset 0 0 0 1px var(--borda)}
+/* ============ barra superior ============ */
+.barra{height:var(--barra);display:flex;align-items:center;gap:12px;padding:0 18px;
+  background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--cinza2);position:relative;z-index:60;flex:0 0 auto}
+.barra .casa{background:none;border:0;width:28px;height:28px;padding:4px;color:var(--tinta2);
+  cursor:pointer;opacity:0;pointer-events:none;transition:.18s;flex:0 0 auto}
+.barra .casa.on{opacity:1;pointer-events:auto}
+.barra .casa:hover{color:var(--tinta)}
+.barra .casa svg{width:100%;height:100%}
+.barra .marca{font-size:15px;font-weight:600;letter-spacing:-.015em}
+.barra .marca em{font-style:normal;color:var(--verde)}
+.abas{margin-left:auto;display:none;gap:2px}
+.abas.on{display:flex}
+.abas button{background:none;border:0;color:var(--tinta3);font:600 13.5px var(--ui);
+  padding:6px 13px;border-radius:8px;cursor:pointer;transition:.15s}
+.abas button:hover{color:var(--tinta);background:var(--cinza)}
+.abas button.on{color:var(--branco);background:var(--tinta)}
 
-select,input[type=text],input[type=file],textarea{width:100%;background:rgba(0,0,0,.28);
-  border:1px solid var(--borda2);border-radius:12px;padding:10px 13px;transition:.18s}
-select:focus,input:focus,textarea:focus{outline:0;border-color:var(--esm3)}
-label.f{display:block;margin:15px 0 7px;font-size:11.5px;color:var(--txt2);font-weight:400}
-.hint{font-size:12px;color:var(--mut);line-height:1.65;margin:11px 0 0}
-.row{display:flex;gap:9px;margin-top:11px}
-::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(122,232,168,.16);border-radius:6px;
-  border:3px solid transparent;background-clip:content-box}
-::-webkit-scrollbar-thumb:hover{background:rgba(122,232,168,.3);background-clip:content-box}
+/* ============ telas ============ */
+.tela{display:none;flex:1;min-height:0}
+.tela.on{display:flex;flex-direction:column;animation:surge .22s cubic-bezier(.32,.72,0,1)}
+#app{display:flex;flex-direction:column;height:100vh}
+.rola{flex:1;min-height:0;overflow-y:auto}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--cinza2);border-radius:5px}
+::-webkit-scrollbar-thumb:hover{background:var(--linha)}
 
-/* ---------- tela de avaliação ---------- */
-#aud{position:absolute;inset:0;z-index:820;display:flex;flex-direction:column;
-  background:linear-gradient(180deg,#0A2218 0%,#061710 38%,#04120C 100%)}
-#aud[hidden]{display:none}
-#audContagem{font-size:12.5px;color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap}
-#audFechar{margin-left:auto;background:var(--v1);border:1px solid var(--borda2);border-radius:50%;
-  width:34px;height:34px;color:var(--txt2);font-size:14px;flex:0 0 auto}
-#audFechar:hover{background:var(--v2);color:var(--txt)}
-#audTroca{width:100%;flex:0 0 auto}
-#audTrocaResumo:not(:empty){background:rgba(47,169,110,.10);border:1px solid rgba(47,169,110,.25);
-  border-radius:12px;padding:11px 14px;font-size:12px;line-height:1.55;color:var(--txt2)}
-#audTrocaResumo b{color:var(--esm1);font-weight:600}
-#audFotoNum{font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:52px;text-align:center}
-#audLista{background:var(--v1);border:1px solid var(--borda2);border-radius:10px;
-  width:32px;height:30px;color:var(--txt2);font-size:14px;line-height:1;flex:0 0 auto}
-#audLista:hover{background:var(--v2);color:var(--esm1)}
-.audCab{display:flex;align-items:center;gap:16px;padding:16px 26px;border-bottom:1px solid var(--borda2);flex:0 0 auto}
-.audTec{font-size:17px;font-weight:600;letter-spacing:-.02em}
-.audProg{flex:1;height:4px;background:rgba(0,0,0,.3);border-radius:4px;overflow:hidden;max-width:340px}
-.audProg i{display:block;height:100%;width:0;border-radius:4px;transition:width .3s;
-  background:linear-gradient(90deg,var(--esm4),var(--esm2))}
-.audSalvas{font-size:11.5px;color:var(--esm2);white-space:nowrap;
-  background:rgba(47,169,110,.14);border:1px solid rgba(47,169,110,.25);
-  border-radius:999px;padding:3px 11px}
-.audSalvas:empty{display:none}
-.audIndice{position:absolute;top:62px;left:26px;right:26px;z-index:60;max-height:52vh;overflow-y:auto;
-  background:rgba(9,32,22,.97);border:1px solid var(--borda);border-radius:18px;padding:10px;
-  box-shadow:var(--sombra);display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
-.audIndice[hidden]{display:none}
-.idxItem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;
-  background:transparent;border:1px solid transparent;color:var(--txt2);text-align:left;
-  font-family:var(--ui);font-size:12.5px;transition:.14s;width:100%}
-.idxItem:hover{background:var(--v2);border-color:var(--borda2)}
-.idxItem.atual{background:rgba(47,169,110,.16);border-color:rgba(111,214,155,.35);color:var(--txt)}
-.idxItem.feita{opacity:.55}
-.idxN{flex:0 0 auto;font-size:11px;color:var(--mut);font-variant-numeric:tabular-nums;min-width:20px}
-.idxNome{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.idxNota{flex:0 0 auto;font-size:11.5px;font-weight:600;color:var(--esm1);
-  background:rgba(47,169,110,.16);border-radius:999px;padding:2px 9px;font-variant-numeric:tabular-nums}
-.idxNota.baixa{color:var(--erro);background:rgba(232,115,127,.16)}
-.idxNota.feito{color:var(--esm2)}
-.idxSub{display:block;font-size:10.5px;color:var(--mut)}
-.audCorpo{flex:1;display:grid;grid-template-columns:minmax(330px,1.15fr) minmax(0,1.25fr) 266px;
-  gap:18px;padding:16px 26px 22px;min-height:0;overflow:hidden}
-@media(max-width:1180px){
-  .audCorpo{grid-template-columns:minmax(300px,1fr) minmax(0,1fr);grid-template-rows:auto auto}
-  .audMarcas{grid-column:1 / -1}
-}
-.audCorpo{grid-template-columns:1fr;overflow-y:auto}
-.audDados{display:flex;flex-direction:column;gap:11px;min-height:0}
-.audLinha{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.audLinha.textos{flex:1;min-height:0}
-.audLinha.textos{min-height:190px}
-.campoSigilo{display:flex;gap:8px;align-items:center}
-.campoSigilo input{flex:1;min-width:0;letter-spacing:.04em}
-.campoSigilo button{background:var(--v1);border:1px solid var(--borda2);border-radius:999px;
-  padding:8px 14px;color:var(--mut);font-size:11.5px;font-family:var(--ui);flex:0 0 auto;transition:.16s}
-.campoSigilo button:hover{background:var(--v2);color:var(--esm1);border-color:var(--borda)}
-.campoSigilo input.oculto{-webkit-text-security:disc;text-security:disc;
-  font-family:var(--mono);letter-spacing:.12em}
-.eqDados .campo{background:rgba(0,0,0,.22);border:1px solid var(--borda2);border-radius:12px;padding:10px 13px}
-.campo{background:var(--v1);border:1px solid var(--borda2);border-radius:14px;padding:12px 15px;min-width:0}
-.campo label{display:block;font-size:10.5px;color:var(--mut);margin-bottom:4px}
-.campo span{font-size:13.5px;font-weight:500;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.campo.alto{display:flex;flex-direction:column;min-height:0}
-.campo.alto p{margin:0;font-size:12.5px;line-height:1.6;color:var(--txt2);overflow-y:auto;flex:1;white-space:pre-wrap}
-.campoErro{border-color:var(--erro)!important}
-.audFoto{display:flex;flex-direction:column;gap:11px;min-height:0}
-.audFotoNav{display:flex;gap:9px;align-items:center;flex:0 0 auto}
-.audFotoNav button{flex:1;background:var(--v1);border:1px solid var(--borda2);border-radius:999px;
-  padding:9px 14px;color:var(--txt2);font-size:12px;font-family:var(--ui);transition:.16s}
-.audFotoNav button:hover:not(:disabled){background:var(--v2);color:var(--esm1);border-color:var(--borda)}
-.audFotoNav button:disabled{opacity:.3;cursor:not-allowed}
-.audImg{flex:1;background:rgba(0,0,0,.35);border:1px solid var(--borda2);border-radius:16px;
-  display:grid;place-items:center;overflow:hidden;min-height:0;position:relative}
-.audImg img{max-width:100%;max-height:100%;object-fit:contain;display:block}
-.audImg .vazio{color:var(--mut);font-size:13px}
-.audImg .carregando{position:absolute;inset:0;display:grid;place-items:center;color:var(--mut);font-size:12.5px}
-.audImg{min-height:280px}
-.audMarcas{display:flex;flex-direction:column;gap:8px;min-height:0;overflow-y:auto}
-.audMarcas h4{margin:0 0 3px;font-size:11.5px;font-weight:500;color:var(--mut);text-align:center}
-.audMarcas{overflow:visible}
-.audLegenda{margin:2px 0 0;font-size:10.5px;color:var(--mut);text-align:center;line-height:1.5}
-.audLegenda b{color:var(--txt2);font-weight:500}
-.audNota{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;
-  background:var(--v1);border:1px solid var(--borda2);border-radius:14px;padding:11px 15px}
-.audNota span{font-size:11.5px;color:var(--mut)}
-.audNota b{font-size:22px;font-weight:600;color:var(--esm1);font-variant-numeric:tabular-nums}
-.audNota b.baixa{color:var(--erro)}
-.audNav{display:flex;gap:8px}
-.audNav .btn{flex:1;padding:9px 10px;font-size:12px}
-/* ---------- capa ---------- */
-#v-menu{position:fixed;inset:0;z-index:900;overflow:auto;
-  background:linear-gradient(180deg,#0A2218 0%,#061710 42%,#03100B 100%)}
-#v-menu:not(.on){display:none}
-.capaFundo{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(720px 420px at 16% -6%, rgba(47,169,110,.22), transparent 62%),
-             radial-gradient(540px 340px at 92% 106%, rgba(111,214,155,.10), transparent 60%);
-  animation:respira 9s ease-in-out infinite alternate}
-.capa{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:46px 36px 30px;
-  min-height:100vh;display:flex;flex-direction:column}
-.capaCab{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;
-  flex-wrap:wrap;margin-bottom:auto}
-.capaMarca{font-size:11.5px;font-weight:500;color:var(--esm2);margin:0 0 11px;
-  letter-spacing:.11em;text-transform:uppercase}
-.capaH1{font-size:clamp(32px,4.6vw,50px);font-weight:600;letter-spacing:-.035em;line-height:1.06;
-  margin:0;color:var(--txt)}
-.capaH1 em{font-style:normal;color:var(--esm2)}
-.capaHoje{font:400 12.5px/1.7 var(--mono);color:var(--mut);text-align:right;padding-top:7px}
-.capaHoje b{display:block;color:var(--txt2);font-size:14px;font-weight:500}
-
-.cartoes{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:15px;margin:46px 0}
-.cartao{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:7px;
-  background:var(--v1);border:1px solid var(--borda2);border-radius:22px;padding:25px 25px 52px;
-  color:var(--txt);text-align:left;min-height:206px;
-  transition:transform .22s cubic-bezier(.32,.72,0,1),border-color .22s,background .22s}
-.cartao:hover{transform:translateY(-4px);border-color:var(--borda);background:var(--v2)}
-.cartao:active{transform:translateY(-1px)}
-.cartao.principal{background:linear-gradient(158deg,var(--esm3),var(--esm4));border-color:transparent;
-  color:#03150D;box-shadow:0 10px 36px rgba(47,169,110,.24)}
-.cartao.principal:hover{background:linear-gradient(158deg,#35BC7C,#1A855A)}
-.cartaoNum{font-size:56px;font-weight:600;letter-spacing:-.05em;line-height:.9;
-  font-variant-numeric:tabular-nums;margin-bottom:5px}
-.cartaoIco{width:38px;height:38px;color:var(--esm2);margin-bottom:12px}
+/* ============ capa ============ */
+#t-capa{background:var(--preto);position:relative;overflow:hidden}
+.capa{position:relative;z-index:2;max-width:1100px;margin:auto;width:100%;
+  padding:40px 36px;display:flex;flex-direction:column;gap:38px}
+.capaLuz{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(720px 400px at 16% -6%, rgba(30,138,46,.3), transparent 62%),
+             radial-gradient(540px 340px at 96% 106%, rgba(52,199,89,.14), transparent 60%)}
+.capaCab{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.capaOlho{font:600 12px var(--ui);color:var(--verde-c);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:10px}
+.capaCab h1{font-size:clamp(32px,4.6vw,50px);font-weight:700;letter-spacing:-.04em;
+  line-height:1.05;color:var(--branco)}
+.capaCab h1 em{font-style:normal;color:var(--verde-c)}
+.capaData{font:500 13px/1.6 var(--mono);color:#6E6E73;text-align:right}
+.capaData b{display:block;color:#A1A1A6;font-size:15px}
+.cartoes{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:15px}
+.cartao{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+  background:#131315;border:1px solid #242427;border-radius:20px;padding:24px 24px 48px;
+  color:var(--branco);font-family:var(--ui);text-align:left;cursor:pointer;min-height:188px;
+  transition:transform .2s cubic-bezier(.32,.72,0,1),border-color .2s,background .2s}
+.cartao:hover{transform:translateY(-3px);border-color:#3A3A3E;background:#17171A}
+.cartao.destaque{background:linear-gradient(152deg,#1E8A2E,#146022);border-color:transparent}
+.cartao.destaque:hover{background:linear-gradient(152deg,#23A037,#176B26)}
+.cartaoNum{font-size:52px;font-weight:700;letter-spacing:-.05em;line-height:.92;
+  font-variant-numeric:tabular-nums;margin-bottom:2px}
+.cartaoIco{width:36px;height:36px;color:var(--verde-c);margin-bottom:10px}
 .cartaoIco svg{width:100%;height:100%}
-.cartaoTit{font-size:18px;font-weight:500;letter-spacing:-.02em}
-.cartaoSub{font-size:13px;color:var(--mut);line-height:1.55}
-.cartao.principal .cartaoSub{color:rgba(3,21,13,.72)}
-.cartaoSeta{position:absolute;right:23px;bottom:21px;font-size:20px;opacity:.38;
-  transition:opacity .2s,transform .2s}
+.cartaoTit{font-size:17.5px;font-weight:600;letter-spacing:-.02em}
+.cartaoSub{font-size:13px;color:#9A9AA0;line-height:1.5}
+.cartao.destaque .cartaoSub{color:rgba(255,255,255,.78)}
+.cartaoSeta{position:absolute;right:22px;bottom:20px;font-size:19px;opacity:.38;transition:.2s}
 .cartao:hover .cartaoSeta{opacity:1;transform:translateX(3px)}
-
 .capaPe{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
-  padding-top:21px;border-top:1px solid var(--borda2)}
-.capaAssin{display:flex;align-items:center;gap:11px}
-.capaAssin .av{width:33px;height:33px;border-radius:50%;background:var(--esm3);color:#03150D;
-  display:grid;place-items:center;font-weight:600;font-size:12.5px;flex:0 0 auto}
-.capaAssin>span:last-child{display:flex;flex-direction:column;line-height:1.35}
-.capaAssin b{font-size:13px;font-weight:500;color:var(--txt)}
-.capaAssin small{font-size:11px;color:var(--mut)}
-.capaVer{font:400 11px var(--mono);color:var(--mut);letter-spacing:.05em}
+  padding-top:20px;border-top:1px solid #1D1D20}
+.capaQuem{display:flex;align-items:center;gap:11px}
+.capaQuem i{width:33px;height:33px;border-radius:50%;background:var(--verde);color:var(--branco);
+  display:grid;place-items:center;font:700 13px var(--ui);font-style:normal;flex:0 0 auto}
+.capaQuem div{display:flex;flex-direction:column;line-height:1.35}
+.capaQuem b{font-size:13.5px;color:var(--branco)}
+.capaQuem small{font-size:11.5px;color:#6E6E73}
+.capaVer{font:500 11.5px var(--mono);color:#5A5A5E;letter-spacing:.05em}
 
-/* ---------- barra permanente ---------- */
-.appbar{position:sticky;top:0;z-index:50;height:52px;display:flex;align-items:center;gap:12px;
-  padding:0 20px;background:rgba(4,18,12,.9);backdrop-filter:blur(20px) saturate(160%);
-  -webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--borda2)}
-.appbar .inicio{width:30px;height:30px;padding:5px;color:var(--txt2);opacity:0;
-  pointer-events:none;transition:opacity .2s;flex:0 0 auto}
-.appbar .inicio.on{opacity:.8;pointer-events:auto}
-.appbar .inicio:hover{opacity:1;color:var(--esm2)}
-.appbar .inicio svg{width:100%;height:100%}
-.appbar .ttl{font-size:14.5px;font-weight:500;letter-spacing:-.01em}
-.appbar .dir{color:var(--esm2)}
-.navTopo{margin-left:auto;display:none;gap:3px}
-.navTopo.on{display:flex}
-.navTopo button{color:var(--mut);font-size:13px;font-weight:450;padding:7px 13px;
-  border-radius:9px;transition:.15s}
-.navTopo button:hover{color:var(--txt);background:var(--v1)}
-.navTopo button.on{color:#03150D;background:var(--esm2);font-weight:500}
+/* ============ páginas de conteúdo ============ */
+.topo{background:var(--cinza);border-bottom:1px solid var(--cinza2);flex:0 0 auto}
+.topo .meio{max-width:1000px;margin:0 auto;padding:30px 26px 26px}
+.olho{font:600 12.5px var(--ui);color:var(--verde);margin-bottom:5px}
+.topo h1{font-size:clamp(24px,3.4vw,31px);font-weight:700;letter-spacing:-.03em;line-height:1.15}
+.meio{max-width:1000px;margin:0 auto;padding:24px 26px 36px}
+.meio.largo{max-width:1180px}
+h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
+.aviso{background:var(--verde-f);border-radius:13px;padding:13px 16px;font-size:14px;line-height:1.55}
+.aviso b{display:block;margin-bottom:2px}
+.aviso.amb{background:var(--ambar-f)}
+.aviso.err{background:var(--vermelho-f)}
 
-/* ---------- telas internas ---------- */
-.view{display:none}
-.view.on{display:block;animation:surge .24s cubic-bezier(.32,.72,0,1)}
-.container{max-width:980px;margin:0 auto;padding:26px}
-.container.larga{max-width:1120px}
-.hero{border-bottom:1px solid var(--borda2);
-  background:linear-gradient(180deg,rgba(47,169,110,.07),transparent)}
-.hero .in{max-width:980px;margin:0 auto;padding:34px 26px 28px}
-.eyebrow{font-size:11.5px;font-weight:500;color:var(--esm2);margin:0 0 7px;
-  letter-spacing:.09em;text-transform:uppercase}
-.hero h1{font-size:clamp(24px,4vw,32px);font-weight:600;letter-spacing:-.03em;line-height:1.14;margin:0}
-h2{font-size:17px;font-weight:500;letter-spacing:-.02em;margin:28px 0 10px}
-.note{background:rgba(47,169,110,.08);border:1px solid rgba(47,169,110,.2);border-radius:14px;
-  padding:13px 16px;font-size:13.5px;line-height:1.6;color:var(--txt2)}
-.note b{display:block;color:var(--esm1);margin-bottom:3px;font-weight:500}
-.note.alerta{background:rgba(232,182,92,.08);border-color:rgba(232,182,92,.22)}
-.note.alerta b{color:var(--amb)}
-.note.erro{background:rgba(232,115,127,.08);border-color:rgba(232,115,127,.22)}
-.note.erro b{color:var(--erro)}
+/* botões: largura pelo conteúdo, não esticados */
+.bt{border:0;border-radius:12px;padding:12px 22px;font:600 15px var(--ui);cursor:pointer;
+  background:var(--verde);color:var(--branco);transition:.15s;letter-spacing:-.01em}
+.bt:hover{background:var(--verde-e)}
+.bt:disabled{opacity:.42;cursor:default}
+.bt.neutro{background:var(--cinza);color:var(--tinta)}
+.bt.neutro:hover{background:var(--cinza2)}
+.bt.fino{padding:9px 16px;font-size:13.5px}
+.linhaBt{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
 
-.drop{border:2px dashed var(--borda);border-radius:20px;padding:40px 22px;text-align:center;
-  background:var(--v1);transition:.18s;cursor:pointer}
-.drop:hover,.drop.sobre{border-color:var(--esm3);background:rgba(47,169,110,.08)}
-.drop b{display:block;font-size:16.5px;font-weight:500;letter-spacing:-.02em}
-.drop small{display:block;font-size:13px;color:var(--mut);margin-top:6px}
+/* soltar arquivo */
+.solte{border:2px dashed var(--linha);border-radius:20px;padding:40px 24px;text-align:center;
+  background:var(--cinza);transition:.18s;cursor:pointer}
+.solte.sobre{border-color:var(--verde);background:var(--verde-f)}
+.solte b{display:block;font-size:17px;font-weight:600;letter-spacing:-.02em}
+.solte small{display:block;font-size:13.5px;color:var(--tinta2);margin-top:5px}
 
-.tile{display:flex;align-items:center;gap:13px;width:100%;background:transparent;
-  border-bottom:1px solid var(--borda2);padding:12px 10px;text-align:left;
-  border-radius:11px;transition:background .14s}
-.tile:hover{background:var(--v1)}
-.tile .ic{width:38px;height:38px;border-radius:11px;background:var(--v1);color:var(--txt2);
-  display:grid;place-items:center;font-size:13px;font-weight:600;flex:0 0 auto}
-.tile.feita .ic{background:rgba(47,169,110,.16);color:var(--esm1)}
-.tile.baixa .ic{background:rgba(232,115,127,.16);color:var(--erro)}
-.tile span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column}
-.tile b{font-size:14.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tile small{font-size:12.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tile .arrow{color:var(--mut);font-size:19px;flex:0 0 auto}
+/* lista */
+.numeros{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:11px;margin:14px 0}
+.numero{background:var(--cinza);border-radius:14px;padding:14px 16px}
+.numero b{display:block;font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.numero span{font-size:12px;color:var(--tinta2);display:block;margin-top:4px}
+.numero.verde b{color:var(--verde)} .numero.amb b{color:var(--ambar)} .numero.vm b{color:var(--vermelho)}
+.item{display:flex;align-items:center;gap:13px;width:100%;background:none;border:0;
+  border-bottom:1px solid var(--cinza2);padding:12px 10px;text-align:left;cursor:pointer;
+  font:16px var(--ui);border-radius:10px;transition:background .14s}
+.item:hover{background:var(--cinza)}
+.item .bolha{width:38px;height:38px;border-radius:11px;background:var(--cinza);color:var(--tinta2);
+  display:grid;place-items:center;font:700 13px var(--ui);flex:0 0 auto}
+.item.feito .bolha{background:var(--verde-f);color:var(--verde)}
+.item.baixa .bolha{background:var(--vermelho-f);color:var(--vermelho)}
+.item .txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.item b{font-size:15px;font-weight:600;letter-spacing:-.01em;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.item small{font-size:12.5px;color:var(--tinta3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .seta{color:var(--tinta3);font-size:19px;flex:0 0 auto}
 
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:11px;margin:16px 0}
-.kpi{background:var(--v1);border:1px solid var(--borda2);border-radius:14px;padding:14px 16px}
-.kpi b{display:block;font-size:25px;font-weight:600;letter-spacing:-.03em;line-height:1}
-.kpi span{font-size:12px;color:var(--mut);display:block;margin-top:4px}
-.kpi.bom b{color:var(--esm2)} .kpi.ruim b{color:var(--erro)} .kpi.meio b{color:var(--amb)}
+/* ============ AVALIAÇÃO: três colunas fixas ============ */
+#t-aval.on{display:flex;flex-direction:column;overflow:hidden}
+.avCab{display:flex;align-items:center;gap:14px;padding:9px 24px;flex:0 0 auto;
+  border-bottom:1px solid var(--cinza2);background:var(--branco)}
+.avLuz{width:8px;height:8px;border-radius:50%;background:var(--linha);flex:0 0 auto}
+.avLuz.on{background:var(--verde-c);box-shadow:0 0 0 3px rgba(52,199,89,.2)}
+.avPonte{font-size:12.5px;color:var(--tinta3);white-space:nowrap}
+.avProg{flex:1;height:4px;background:var(--cinza2);border-radius:3px;overflow:hidden;min-width:60px}
+.avProg i{display:block;height:100%;background:var(--verde);border-radius:3px;transition:width .3s}
+.avConta{font:500 12.5px var(--mono);color:var(--tinta2);flex:0 0 auto}
+.avCab .mini{background:var(--cinza);border:0;border-radius:8px;width:30px;height:28px;
+  color:var(--tinta2);font-size:13px;cursor:pointer;flex:0 0 auto}
+.avCab .mini:hover{background:var(--cinza2);color:var(--tinta)}
 
-.campo{background:var(--v1);border:1px solid var(--borda2);border-radius:13px;padding:11px 14px}
-.campo label{display:block;font-size:10.5px;color:var(--mut);margin-bottom:3px}
-.campo span,.campo p{font-size:13.5px;margin:0;line-height:1.5}
-.campo.alto p{font-size:12.5px;line-height:1.6;color:var(--txt2);max-height:168px;overflow-y:auto;
-  white-space:pre-wrap}
-.oculto{-webkit-text-security:disc}
-.btnFull{width:100%;background:linear-gradient(180deg,var(--esm2),var(--esm3));color:#03150D;
-  border-radius:15px;padding:15px;font-size:15.5px;font-weight:500;margin-top:4px;
-  box-shadow:0 6px 20px rgba(47,169,110,.24)}
-.btnFull.alt{background:var(--v1);color:var(--txt);box-shadow:inset 0 0 0 1px var(--borda2)}
+.avGrade{flex:1;min-height:0;display:grid;
+  grid-template-columns:minmax(320px,1fr) minmax(0,1.3fr) 272px;
+  gap:18px;padding:16px 24px 18px}
 
-.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(9,32,22,.97);
-  border:1px solid var(--borda);color:var(--txt);padding:13px 20px;border-radius:14px;
-  font-size:13.5px;z-index:1000;box-shadow:var(--sombra);max-width:86vw;text-align:center}
-.toast[hidden]{display:none}
-.carregando{display:flex;align-items:center;gap:11px;color:var(--txt2);font-size:14px;padding:30px 0}
-.carregando span{width:16px;height:16px;border:2.5px solid var(--borda2);border-top-color:var(--esm2);
-  border-radius:50%;animation:girar .8s linear infinite}
+/* -- coluna 1: a ficha -- */
+.ficha{display:flex;flex-direction:column;gap:11px;min-height:0}
+.fichaNome{font-size:19px;font-weight:600;letter-spacing:-.025em;line-height:1.25;flex:0 0 auto}
+.etiquetas{display:flex;flex-wrap:wrap;gap:5px;flex:0 0 auto}
+.etq{background:var(--cinza);border-radius:980px;padding:4px 11px;font-size:11.5px;
+  color:var(--tinta2);white-space:nowrap}
+.etq[hidden]{display:none}
+.etq.os{background:var(--tinta);color:var(--branco);font:500 11px var(--mono)}
+.fichaEnd{font-size:12.5px;color:var(--tinta3);line-height:1.5;flex:0 0 auto}
+.fichaEnd[hidden]{display:none}
 
-.ponte{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--mut);
-  padding:7px 24px;border-bottom:1px solid var(--borda2);flex:0 0 auto}
-.luz{width:8px;height:8px;border-radius:50%;background:var(--mut);flex:0 0 auto}
-.luz.on{background:var(--esm2);box-shadow:0 0 0 3px rgba(111,214,155,.18)}
+.textos{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
+.texto{display:flex;flex-direction:column;min-height:0;background:var(--cinza);
+  border-radius:14px;overflow:hidden;position:relative}
+.texto.abre{flex:1}
+.texto.fecha{flex:1.5}
+.texto header{display:flex;align-items:center;gap:8px;padding:9px 14px 6px;flex:0 0 auto}
+.texto header b{font:700 10px var(--ui);text-transform:uppercase;letter-spacing:.08em;
+  color:var(--tinta3)}
+.texto.fecha header b{color:var(--verde)}
+.texto header button{margin-left:auto;background:none;border:0;color:var(--tinta3);
+  font:600 11px var(--ui);cursor:pointer;padding:3px 8px;border-radius:7px;opacity:0;transition:.15s}
+.texto:hover header button,.texto.cortado header button{opacity:1}
+.texto header button:hover{background:var(--cinza2);color:var(--tinta)}
+.texto.cortado header button{color:var(--verde)}
+.corpo{flex:1;min-height:0;overflow-y:auto;padding:0 14px 12px;font-size:13.5px;
+  line-height:1.62;color:var(--tinta2)}
+.corpo b{color:var(--tinta);font-weight:600}
+.corpo mark{background:rgba(30,138,46,.13);color:var(--verde-e);padding:0 3px;
+  border-radius:4px;font-weight:600}
+.semTexto{color:var(--tinta3);font-style:italic;font-size:12.5px}
+.texto.cortado::after{content:'';position:absolute;left:0;right:0;bottom:0;height:24px;
+  background:linear-gradient(transparent,var(--cinza));pointer-events:none}
 
-@media(max-width:900px){
-  .capa{padding:30px 20px 24px}
-  .cartoes{grid-template-columns:1fr;gap:11px;margin:30px 0}
-  .cartao{min-height:0;padding:19px 21px 44px}
-  .cartaoNum{font-size:40px}
+.obs{flex:0 0 auto}
+.obs input{width:100%;border:1px solid var(--linha);border-radius:11px;padding:10px 13px;
+  font-size:13.5px;color:var(--tinta)}
+.obs input:focus{outline:0;border-color:var(--verde)}
+
+/* -- coluna 2: a foto -- */
+.colFoto{display:flex;flex-direction:column;gap:10px;min-height:0}
+.fotoBarra{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.fotoBarra button{background:var(--cinza);border:0;border-radius:980px;width:32px;height:32px;
+  font-size:16px;color:var(--tinta);cursor:pointer;flex:0 0 auto}
+.fotoBarra button:hover{background:var(--cinza2)}
+.fotoBarra button:disabled{opacity:.35;cursor:default}
+.fotoBarra .qual{font:500 12.5px var(--mono);color:var(--tinta2)}
+.fotoBarra .rotulo{margin-left:auto;font-size:12.5px;color:var(--tinta3);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.foto{flex:1;min-height:0;border-radius:16px;overflow:hidden;background:#0C0C0D;
+  display:grid;place-items:center;box-shadow:var(--sombra)}
+.foto img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;
+  cursor:zoom-in;display:block}
+.foto img.zoom{transform:scale(2.2);transition:transform .25s;cursor:zoom-out}
+.foto .nada{color:#6E6E73;font-size:14px;text-align:center;padding:24px}
+
+/* -- coluna 3: os critérios -- */
+.marcas{display:flex;flex-direction:column;gap:9px;min-height:0}
+.marcasTit{font:600 11px var(--ui);text-transform:uppercase;letter-spacing:.07em;
+  color:var(--tinta3);flex:0 0 auto}
+.listaCrit{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;
+  padding-right:2px}
+.crit{display:flex;align-items:center;gap:10px;background:var(--branco);
+  border:1.5px solid var(--linha);border-radius:11px;padding:9px 12px;cursor:pointer;
+  transition:.13s;font-size:14px;text-align:left;width:100%}
+.crit:hover{border-color:var(--tinta3)}
+.crit .tcl{width:21px;height:21px;border-radius:6px;background:var(--cinza);color:var(--tinta3);
+  font:600 11px/1 var(--mono);display:grid;place-items:center;flex:0 0 auto}
+.crit .nm{flex:1;min-width:0}
+.crit .st{font:600 12px var(--ui);color:var(--tinta3);flex:0 0 auto}
+.crit.sim{border-color:var(--verde);background:var(--verde-f)}
+.crit.sim .tcl{background:var(--verde);color:var(--branco)}
+.crit.sim .st{color:var(--verde)}
+.crit.nao{border-color:var(--vermelho);background:var(--vermelho-f)}
+.crit.nao .tcl{background:var(--vermelho);color:var(--branco)}
+.crit.nao .st{color:var(--vermelho)}
+.crit.ausente{border-style:dashed;margin-top:3px}
+.crit.ausente .nm small{display:block;font-size:10.5px;color:var(--tinta3);line-height:1.35;margin-top:1px}
+.crit.ausente.on{border-color:var(--ambar);background:var(--ambar-f);border-style:solid}
+.crit.ausente.on .tcl{background:var(--ambar);color:var(--branco)}
+.critDica{font-size:11px;color:var(--tinta3);line-height:1.45;flex:0 0 auto}
+.critDica b{color:var(--tinta2)}
+
+.notaCx{display:flex;align-items:center;justify-content:space-between;background:var(--cinza);
+  border-radius:12px;padding:11px 15px;flex:0 0 auto}
+.notaCx span{font-size:12.5px;color:var(--tinta2)}
+.notaCx b{font-size:25px;font-weight:700;letter-spacing:-.03em;color:var(--verde);
+  font-variant-numeric:tabular-nums}
+.notaCx b.media{color:var(--ambar)} .notaCx b.baixa{color:var(--vermelho)}
+.notaCx b.nula{color:var(--tinta3);font-size:19px}
+.avAcoes{display:flex;flex-direction:column;gap:7px;flex:0 0 auto}
+.avAcoes .bt{width:100%;padding:13px}
+.avPar{display:flex;gap:7px}
+.avPar .bt{flex:1;padding:10px;font-size:13.5px}
+
+@media(max-width:1200px){
+  .avGrade{grid-template-columns:minmax(290px,1fr) minmax(0,1fr);grid-template-rows:1fr auto}
+  .marcas{grid-column:1 / -1;max-height:230px}
+  .listaCrit{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+    align-content:start}
+  .avAcoes{flex-direction:row}
+  .avAcoes .bt{flex:1}
 }
 
+/* índice de ordens */
+.indice{position:absolute;left:24px;right:24px;top:92px;z-index:50;max-height:54vh;overflow-y:auto;
+  background:var(--branco);border:1px solid var(--linha);border-radius:17px;padding:9px;
+  box-shadow:var(--sombra);display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:3px}
+.indice[hidden]{display:none}
+.idx{display:flex;align-items:center;gap:10px;padding:8px 11px;border:0;background:none;
+  border-radius:9px;cursor:pointer;font:14px var(--ui);text-align:left;color:var(--tinta2)}
+.idx:hover{background:var(--cinza)}
+.idx.atual{background:var(--verde-f);color:var(--tinta)}
+.idx.feita{opacity:.5}
+.idx i{font:500 11px var(--mono);color:var(--tinta3);min-width:20px;font-style:normal;flex:0 0 auto}
+.idx span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.idx b{font:600 12px var(--mono);color:var(--verde);flex:0 0 auto}
 
-/* ---------- painel visual ---------- */
-.carregando{display:flex;align-items:center;gap:11px;color:var(--txt2);font-size:15px;padding:30px 0}
-.carregando span{width:17px;height:17px;border:2.5px solid var(--borda2);border-top-color:var(--esm2);
-  border-radius:50%;animation:girar .8s linear infinite}
-@keyframes girar{to{transform:rotate(360deg)}}
+/* leitura ampliada */
+.leitor{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);
+  display:grid;place-items:center;padding:34px}
+.leitor[hidden]{display:none}
+.leitorCx{background:var(--branco);border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.25);
+  width:min(760px,100%);max-height:84vh;display:flex;flex-direction:column;overflow:hidden}
+.leitorCx header{display:flex;align-items:flex-start;gap:14px;padding:19px 24px 13px;
+  border-bottom:1px solid var(--cinza2);flex:0 0 auto}
+.leitorCx header b{display:block;font-size:16.5px;font-weight:600;letter-spacing:-.02em}
+.leitorCx header small{display:block;font-size:12.5px;color:var(--tinta3);margin-top:2px}
+.leitorCx header button{margin-left:auto;background:var(--cinza);border:0;border-radius:50%;
+  width:29px;height:29px;color:var(--tinta2);font-size:12px;cursor:pointer;flex:0 0 auto}
+.leitorCx .corpo{padding:18px 24px 24px;font-size:15px;line-height:1.72}
 
-.pnTopo{display:flex;align-items:center;gap:30px;flex-wrap:wrap;margin:6px 0 26px}
-.pnMedia{position:relative;width:124px;height:124px;flex:0 0 auto}
-.pnAnel{width:100%;height:100%}
-.anelArco{animation:preencher 1.2s cubic-bezier(.32,.72,0,1) .25s forwards}
-@keyframes preencher{to{stroke-dashoffset:var(--alvo)}}
-.pnMediaTxt{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
-.pnMediaTxt b{display:block;font-size:35px;font-weight:700;letter-spacing:-.04em;line-height:1}
-.pnMediaTxt span{font-size:11.5px;color:var(--mut)}
-.pnNums{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;flex:1;min-width:280px}
-.pnNum{background:var(--v1);border:1px solid var(--borda2);border-radius:15px;padding:14px 16px}
-.pnNum b{display:block;font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--txt)}
-.pnNum span{font-size:12px;color:var(--mut);display:block;margin-top:4px}
+/* ============ configurações ============ */
+.campo{margin-bottom:15px;max-width:560px}
+.campo label{display:block;font:600 13px var(--ui);margin-bottom:6px}
+.campo input{width:100%;border:1px solid var(--linha);border-radius:12px;padding:12px 14px;
+  font-size:15px;color:var(--tinta)}
+.campo input:focus{outline:0;border-color:var(--verde)}
+.campo small{display:block;font-size:12.5px;color:var(--tinta3);margin-top:5px;line-height:1.45}
+.sigilo{-webkit-text-security:disc}
 
-.pnFiltros{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
-.pnChip{border:1px solid var(--borda2);background:var(--v1);color:var(--txt2);border-radius:980px;
-  padding:7px 15px;font:600 13px var(--ui);cursor:pointer;transition:.15s}
-.pnChip:hover{border-color:var(--borda);color:var(--txt)}
-.pnChip.on{background:var(--esm2);border-color:var(--esm2);color:#03150D}
-
-.pnSub{font-size:13px;color:var(--mut);margin:-6px 0 12px}
-.pnCeu,.pnOnda{position:relative;background:var(--v1);border:1px solid var(--borda2);
-  border-radius:18px;padding:14px;margin-bottom:8px}
+/* ============ painel ============ */
+.carregando{display:flex;align-items:center;gap:11px;color:var(--tinta2);font-size:15px;padding:28px 0}
+.carregando i{width:16px;height:16px;border:2.5px solid var(--cinza2);border-top-color:var(--verde);
+  border-radius:50%;animation:girar .8s linear infinite;font-style:normal}
+.pnTopo{display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin:4px 0 24px}
+.pnAnelCx{position:relative;width:118px;height:118px;flex:0 0 auto}
+.pnAnelCx svg{width:100%;height:100%}
+.pnArco{animation:encher 1.2s cubic-bezier(.32,.72,0,1) .25s forwards}
+@keyframes encher{to{stroke-dashoffset:var(--alvo)}}
+.pnAnelTxt{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.pnAnelTxt b{display:block;font-size:33px;font-weight:700;letter-spacing:-.04em;line-height:1}
+.pnAnelTxt span{font-size:11.5px;color:var(--tinta3)}
+.pnChips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.pnChip{border:1px solid var(--linha);background:var(--branco);color:var(--tinta2);
+  border-radius:980px;padding:6px 14px;font:600 12.5px var(--ui);cursor:pointer;transition:.15s}
+.pnChip:hover{border-color:var(--tinta3);color:var(--tinta)}
+.pnChip.on{background:var(--tinta);border-color:var(--tinta);color:var(--branco)}
+.pnSub{font-size:12.5px;color:var(--tinta3);margin:-5px 0 11px}
+.pnCaixa{position:relative;background:var(--branco);border:1px solid var(--cinza2);
+  border-radius:17px;padding:13px;margin-bottom:6px}
 .pnSvg{width:100%;height:auto;display:block;overflow:visible}
-.pnEixo{font:500 11px var(--mono);fill:#6E8B7D}
-
-.pnPonto{animation:surgePonto .5s cubic-bezier(.32,.72,0,1) forwards;cursor:pointer;transition:r .14s}
-@keyframes surgePonto{from{r:0;opacity:0}to{r:5.5;opacity:.88}}
-.pnPonto:hover{opacity:1}
-
-.pnDica{position:absolute;transform:translateY(-100%);background:#071A13;color:var(--txt);
-  border:1px solid var(--borda);border-radius:12px;padding:9px 13px;font-size:12.5px;
-  line-height:1.5;pointer-events:none;z-index:10;box-shadow:var(--sombra);max-width:215px}
+.pnEixo{font:500 11px var(--mono);fill:#86868B}
+.pnPonto{animation:brotar .5s cubic-bezier(.32,.72,0,1) forwards;cursor:pointer;transition:r .14s}
+@keyframes brotar{from{r:0;opacity:0}to{r:5.5;opacity:.87}}
+.pnDica{position:absolute;transform:translateY(-100%);background:var(--tinta);color:var(--branco);
+  border-radius:11px;padding:9px 13px;font-size:12.5px;line-height:1.5;pointer-events:none;
+  z-index:10;box-shadow:var(--sombra);max-width:210px}
 .pnDica[hidden]{display:none}
 .pnDica b{display:block;font-size:13.5px}
-.pnDica span{display:block;color:var(--mut);font-size:11.5px}
+.pnDica span{display:block;color:#A1A1A6;font-size:11.5px}
 .pnDica i{display:block;font-style:normal;font-weight:600;margin-top:3px}
-
-.pnRosa{display:grid;place-items:center;background:var(--v1);border:1px solid var(--borda2);
-  border-radius:18px;padding:18px;margin-bottom:8px}
-.pnSvgRosa{width:100%;max-width:440px;height:auto}
-.pnRot{font:600 10.5px var(--ui);fill:#A9C4B6}
-.pnRotN{font:500 10px var(--mono);fill:#6E8B7D}
-
+.pnRosaCx{display:grid;place-items:center;background:var(--branco);border:1px solid var(--cinza2);
+  border-radius:17px;padding:16px;margin-bottom:6px}
+.pnRosaCx svg{width:100%;max-width:420px;height:auto}
+.pnRot{font:600 10.5px var(--ui);fill:#1D1D1F}
+.pnRotN{font:500 10px var(--mono);fill:#86868B}
 .ondaLinha{stroke-dasharray:2600;stroke-dashoffset:2600;
   animation:tracar 1.4s cubic-bezier(.32,.72,0,1) .2s forwards}
 @keyframes tracar{to{stroke-dashoffset:0}}
 .ondaArea{opacity:0;animation:surge .7s ease .9s forwards}
 .ondaPonto{opacity:0;animation:surge .3s ease forwards}
 
-@media(max-width:760px){
-  .pnTopo{gap:18px}
-  .pnSvg{min-width:540px}
-  .pnCeu,.pnOnda{overflow-x:auto}
+/* ============ aviso flutuante ============ */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--tinta);
+  color:var(--branco);padding:12px 20px;border-radius:13px;font-size:14.5px;z-index:300;
+  box-shadow:var(--sombra);max-width:86vw;text-align:center}
+.toast[hidden]{display:none}
+
+@media(max-width:900px){
+  .capa{padding:28px 20px;gap:26px}
+  .cartoes{grid-template-columns:1fr;gap:11px}
+  .cartao{min-height:0;padding:20px 22px 44px}
+  .cartaoNum{font-size:40px}
+  .meio,.topo .meio{padding-left:18px;padding-right:18px}
 }
-
-/* ---------- ficha da ordem ---------- */
-.audDados{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden}
-
-.fichaTopo{flex:0 0 auto}
-.fichaTopo h3{font-size:19px;font-weight:600;letter-spacing:-.025em;margin:0 0 9px;line-height:1.25}
-.fichaTags{display:flex;flex-wrap:wrap;gap:5px}
-.tag{background:var(--v1);border:1px solid var(--borda2);border-radius:980px;padding:4px 11px;
-  font-size:11.5px;color:var(--txt2);white-space:nowrap}
-.tag[hidden]{display:none}
-.tag:first-child{background:var(--txt);border-color:var(--txt);color:#fff;
-  font-family:var(--mono);font-size:11px;letter-spacing:-.01em}
-.fichaEnd{margin:8px 0 0;font-size:12.5px;color:var(--mut);line-height:1.5}
-.fichaEnd[hidden]{display:none}
-
-/* as descrições dividem o que sobra de altura */
-.textos{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
-.texto{display:flex;flex-direction:column;min-height:0;background:var(--v1);
-  border:1px solid var(--borda2);border-radius:15px;overflow:hidden;flex:1}
-/* o encerramento é o que conta o serviço: ganha mais espaço */
-.texto.principal{flex:1.45}
-.texto header{display:flex;align-items:center;gap:8px;padding:9px 14px 7px;flex:0 0 auto}
-.texto header b{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
-  color:var(--mut)}
-.texto.principal header b{color:var(--esm2)}
-.expandir{margin-left:auto;background:none;border:0;color:var(--mut);font:600 11px var(--ui);
-  cursor:pointer;padding:3px 7px;border-radius:7px;opacity:0;transition:.15s}
-.texto:hover .expandir,.texto.cortado .expandir{opacity:1}
-.expandir:hover{background:var(--v2);color:var(--txt)}
-.texto.cortado .expandir{color:var(--esm2)}
-
-.textoCorpo{flex:1;min-height:0;overflow-y:auto;padding:0 14px 12px;
-  font-size:13.5px;line-height:1.62;color:var(--txt2);white-space:normal}
-.textoCorpo b{color:var(--txt);font-weight:600}
-.textoCorpo mark{background:rgba(30,138,46,.14);color:var(--esm1);padding:0 3px;
-  border-radius:4px;font-weight:600}
-.semTexto{color:var(--mut);font-style:italic;font-size:12.5px}
-
-/* uma sombra no pé avisa que o texto continua */
-.texto.cortado{position:relative}
-.texto.cortado::after{content:'';position:absolute;left:0;right:0;bottom:0;height:26px;
-  background:linear-gradient(transparent, var(--v1));pointer-events:none}
-
-.fichaPe{flex:0 0 auto}
-.fichaPe input{width:100%;border:1px solid var(--borda);border-radius:12px;padding:10px 13px;
-  font-size:13.5px;background:var(--fundo);color:var(--txt)}
-.fichaPe input:focus{outline:0;border-color:var(--esm2)}
-
-/* ---------- leitura ampliada ---------- */
-.leitor{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);
-  backdrop-filter:blur(6px);display:grid;place-items:center;padding:34px}
-.leitor[hidden]{display:none}
-.leitorCaixa{background:var(--fundo);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.3);
-  width:min(760px,100%);max-height:84vh;display:flex;flex-direction:column;overflow:hidden}
-.leitorCaixa header{display:flex;align-items:flex-start;gap:14px;padding:20px 24px 14px;
-  border-bottom:1px solid var(--borda2)}
-.leitorCaixa header b{display:block;font-size:17px;font-weight:600;letter-spacing:-.02em}
-.leitorCaixa header small{display:block;font-size:12.5px;color:var(--mut);margin-top:3px}
-.leitorCaixa header button{margin-left:auto;background:var(--v1);border:0;border-radius:50%;
-  width:30px;height:30px;color:var(--txt2);font-size:13px;cursor:pointer;flex:0 0 auto}
-.leitorCaixa header button:hover{background:var(--v2);color:var(--txt)}
-.leitorTexto{padding:18px 24px 24px;font-size:15px;line-height:1.72}
 
 </style>
 </head>
 <body>
+<div id="app">
 
-<div class="appbar">
-  <button class="inicio" id="back" aria-label="Voltar ao início">
+<div class="barra">
+  <button class="casa" id="btCasa" aria-label="Início">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
       <path d="M4 11.5 12 4l8 7.5M6.5 10v9h11v-9"/></svg>
   </button>
-  <div class="ttl">Avaliação <span class="dir">Direct</span></div>
-  <nav class="navTopo" id="navTopo">
-    <button data-go="carregar">Arquivo</button>
-    <button data-go="lista">Ordens</button>
-    <button data-go="historico">Painel</button>
-    <button data-go="config">Ajustes</button>
+  <div class="marca">Avaliação <em>Direct</em></div>
+  <nav class="abas" id="abas">
+    <button data-ir="arquivo">Arquivo</button>
+    <button data-ir="lista">Ordens</button>
+    <button data-ir="painel">Painel</button>
+    <button data-ir="ajustes">Ajustes</button>
   </nav>
 </div>
 
-<!-- ============ CAPA ============ -->
-<div class="view on" id="v-menu">
-  <div class="capaFundo" aria-hidden="true"></div>
+<!-- ======== CAPA ======== -->
+<div class="tela on" id="t-capa">
+  <div class="capaLuz" aria-hidden="true"></div>
   <div class="capa">
     <header class="capaCab">
       <div>
-        <p class="capaMarca">Direct Internet · Estoque</p>
-        <h1 class="capaH1">Avaliação de<br><em>ocorrências</em></h1>
+        <p class="capaOlho">Direct Internet · Estoque</p>
+        <h1>Avaliação de<br><em>ocorrências</em></h1>
       </div>
-      <div class="capaHoje" id="capaHoje"></div>
+      <div class="capaData" id="capaData"></div>
     </header>
 
     <div class="cartoes">
-      <button class="cartao principal" data-go="carregar">
-        <span class="cartaoNum" id="mNum">—</span>
+      <button class="cartao destaque" data-ir="arquivo">
+        <span class="cartaoNum" id="capaNum">—</span>
         <span class="cartaoTit">Avaliar ocorrências</span>
-        <span class="cartaoSub" id="mResumo">Carregue o relatório de finalizadas</span>
+        <span class="cartaoSub" id="capaSub">Carregue o relatório de finalizadas</span>
         <span class="cartaoSeta">→</span>
       </button>
-      <button class="cartao" data-go="historico">
-        <span class="cartaoIco" aria-hidden="true">
-          <svg viewBox="0 0 40 40" fill="none">
-            <circle cx="9" cy="28" r="3.2" fill="currentColor" opacity=".5"/>
-            <circle cx="18" cy="19" r="3.2" fill="currentColor" opacity=".72"/>
-            <circle cx="27" cy="23" r="3.2" fill="currentColor" opacity=".6"/>
-            <circle cx="34" cy="11" r="3.2" fill="currentColor"/>
-            <path d="M9 28 L18 19 L27 23 L34 11" stroke="currentColor" stroke-width="1.6"
-                  stroke-linecap="round" opacity=".4"/>
-          </svg>
-        </span>
+      <button class="cartao" data-ir="painel">
+        <span class="cartaoIco"><svg viewBox="0 0 40 40" fill="none">
+          <circle cx="9" cy="28" r="3" fill="currentColor" opacity=".55"/>
+          <circle cx="18" cy="19" r="3" fill="currentColor" opacity=".75"/>
+          <circle cx="27" cy="23" r="3" fill="currentColor" opacity=".6"/>
+          <circle cx="34" cy="11" r="3" fill="currentColor"/>
+          <path d="M9 28 18 19 27 23 34 11" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" opacity=".4"/></svg></span>
         <span class="cartaoTit">Painel de produtividade</span>
         <span class="cartaoSub">Nota por técnico, evolução e o que mais falta</span>
         <span class="cartaoSeta">→</span>
       </button>
-      <button class="cartao" data-go="config">
-        <span class="cartaoIco" aria-hidden="true">
-          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="20" cy="20" r="5.4"/>
-            <path d="M20 6v4M20 30v4M6 20h4M30 20h4M10.1 10.1l2.8 2.8M27.1 27.1l2.8 2.8M29.9 10.1l-2.8 2.8M12.9 27.1l-2.8 2.8"
-                  stroke-linecap="round"/>
-          </svg>
-        </span>
+      <button class="cartao" data-ir="ajustes">
+        <span class="cartaoIco"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="20" cy="20" r="5"/>
+          <path d="M20 7v3.5M20 29.5V33M7 20h3.5M29.5 20H33M10.8 10.8l2.5 2.5M26.7 26.7l2.5 2.5M29.2 10.8l-2.5 2.5M13.3 26.7l-2.5 2.5"
+                stroke-linecap="round"/></svg></span>
         <span class="cartaoTit">Configurações</span>
         <span class="cartaoSub">Planilha, ponte das fotos e seu nome</span>
         <span class="cartaoSeta">→</span>
@@ -481,174 +426,173 @@ h2{font-size:17px;font-weight:500;letter-spacing:-.02em;margin:28px 0 10px}
     </div>
 
     <footer class="capaPe">
-      <span class="capaAssin">
-        <span class="av">DS</span>
-        <span><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></span>
-      </span>
-      <span class="capaVer">versão 5 · documento interno</span>
+      <span class="capaQuem"><i>DS</i>
+        <div><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></div></span>
+      <span class="capaVer">versão 6 · documento interno</span>
     </footer>
   </div>
 </div>
 
-<!-- ============ CARREGAR ============ -->
-<div class="view" id="v-carregar">
-  <div class="hero"><div class="in">
-    <p class="eyebrow">Passo 1</p>
-    <h1>Relatório de ordens finalizadas</h1>
+<!-- ======== ARQUIVO ======== -->
+<div class="tela" id="t-arquivo">
+  <div class="topo"><div class="meio">
+    <p class="olho">Passo 1</p><h1>Relatório de ordens finalizadas</h1>
   </div></div>
-  <div class="container">
-    <div class="drop" id="drop">
+  <div class="rola"><div class="meio">
+    <div class="solte" id="solte">
       <b>Solte a planilha aqui</b>
       <small>.xlsx ou .csv exportado do HubSoft</small>
     </div>
     <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" hidden>
-    <p class="note" style="margin-top:16px"><b>De onde vem esse arquivo</b>
+    <div class="aviso" style="margin-top:15px">
+      <b>De onde vem esse arquivo</b>
       No HubSoft, em Ordens de Serviço, filtre pelo período e situação
-      <i>Executada</i>, depois exporte em Excel.</p>
-    <div id="carregado"></div>
-  </div>
+      <i>Executada</i>, depois exporte em Excel.
+    </div>
+    <div id="lido"></div>
+  </div></div>
 </div>
 
-<!-- ============ LISTA ============ -->
-<div class="view" id="v-lista">
-  <div class="hero"><div class="in">
-    <p class="eyebrow" id="listaEyebrow">Passo 2</p>
-    <h1>O que falta avaliar</h1>
+<!-- ======== LISTA ======== -->
+<div class="tela" id="t-lista">
+  <div class="topo"><div class="meio">
+    <p class="olho">Passo 2</p><h1>O que falta avaliar</h1>
   </div></div>
-  <div class="container">
-    <div class="kpis" id="listaKpis"></div>
-    <button class="btnFull" id="btnComecar">Começar</button>
+  <div class="rola"><div class="meio">
+    <div class="numeros" id="listaNums"></div>
+    <div class="linhaBt"><button class="bt" id="btComecar">Começar</button></div>
     <h2>Todas as ordens</h2>
-    <div id="listaOrdens"></div>
-  </div>
+    <div id="listaItens"></div>
+  </div></div>
 </div>
 
-<!-- ============ AVALIAÇÃO ============ -->
-<div class="view" id="v-aval">
-  <div id="aud">
-    <div class="ponte"><span class="luz" id="luz"></span><span id="ponteTxt">Procurando a ponte…</span></div>
-    <div class="audCab">
-      <div class="audTec"><span id="aCliente">—</span></div>
-      <div class="audProg"><i id="prog"></i></div>
-      <span id="audEnviadas" class="audSalvas"></span>
-      <button id="btnIndice" title="Ver todas as ordens">☰</button>
-      <span id="conta">0 / 0</span>
-      <button id="audFechar" aria-label="Fechar">✕</button>
+<!-- ======== AVALIAÇÃO ======== -->
+<div class="tela" id="t-aval">
+  <div class="avCab">
+    <span class="avLuz" id="luz"></span>
+    <span class="avPonte" id="ponteTxt">procurando a ponte…</span>
+    <div class="avProg"><i id="prog"></i></div>
+    <span class="avConta" id="conta">0 / 0</span>
+    <button class="mini" id="btIndice" title="Todas as ordens">☰</button>
+    <button class="mini" id="btSair" title="Voltar à lista">✕</button>
+  </div>
+  <div class="indice" id="indice" hidden></div>
+
+  <div class="avGrade">
+
+    <div class="ficha">
+      <div class="fichaNome" id="fNome">—</div>
+      <div class="etiquetas">
+        <span class="etq os" id="fOS">—</span>
+        <span class="etq" id="fTipo" hidden></span>
+        <span class="etq" id="fData" hidden></span>
+        <span class="etq" id="fTecnico" hidden></span>
+        <span class="etq" id="fPlano" hidden></span>
+      </div>
+      <p class="fichaEnd" id="fEndereco" hidden></p>
+
+      <div class="textos">
+        <section class="texto abre">
+          <header><b>Abertura</b><button data-ampliar="abertura">ampliar</button></header>
+          <div class="corpo" id="fAbertura">—</div>
+        </section>
+        <section class="texto fecha">
+          <header><b>Encerramento</b><button data-ampliar="encerramento">ampliar</button></header>
+          <div class="corpo" id="fFechamento">—</div>
+        </section>
+      </div>
+
+      <div class="obs">
+        <input type="text" id="fObs" placeholder="Observações — vão para a planilha" autocomplete="off">
+      </div>
     </div>
 
-    <div class="audIndice" id="indice" hidden></div>
-
-    <div class="audCorpo">
-      <!-- dados da ordem -->
-      <div class="audDados">
-        <!-- identificação em etiquetas, ocupando pouca altura -->
-        <div class="fichaTopo">
-          <h3 id="aCli">—</h3>
-          <div class="fichaTags">
-            <span class="tag" id="aOS">—</span>
-            <span class="tag" id="aTipo">—</span>
-            <span class="tag" id="aData">—</span>
-            <span class="tag" id="aTecnico" hidden>—</span>
-            <span class="tag" id="aContrato" hidden>—</span>
-          </div>
-          <p class="fichaEnd" id="aEndereco" hidden></p>
-        </div>
-
-        <!-- as descrições ficam com toda a altura que sobrar -->
-        <div class="textos">
-          <section class="texto" data-texto="abertura">
-            <header><b>Abertura</b><button class="expandir" data-expandir="abertura">ampliar</button></header>
-            <div class="textoCorpo" id="aAbertura">—</div>
-          </section>
-          <section class="texto principal" data-texto="encerramento">
-            <header><b>Encerramento</b><button class="expandir" data-expandir="encerramento">ampliar</button></header>
-            <div class="textoCorpo" id="aFechamento">—</div>
-          </section>
-        </div>
-
-        <div class="fichaPe">
-          <input type="text" id="aObs" placeholder="Observações — vão para a planilha" autocomplete="off">
-        </div>
+    <div class="colFoto">
+      <div class="fotoBarra">
+        <button id="fotoAnt" title="seta esquerda">‹</button>
+        <button id="fotoProx" title="seta direita">›</button>
+        <span class="qual" id="fotoQual">—</span>
+        <span class="rotulo" id="fotoRotulo"></span>
       </div>
+      <div class="foto" id="foto"><span class="nada">sem foto</span></div>
+    </div>
 
-      <!-- foto -->
-      <div class="audFoto">
-        <div class="audFotoNav">
-          <button id="fotoAnt">Foto anterior</button>
-          <span id="fotoConta">—</span>
-          <button id="fotoProx">Próxima foto</button>
-        </div>
-        <div class="audImg" id="aFotos"><span class="vazio">sem foto</span></div>
-      </div>
-
-      <!-- critérios -->
-      <div class="audMarcas">
-        <h4>Qual o conteúdo da foto?</h4>
-        <div id="aCriterios"></div>
-        <p class="audLegenda">clique circula: em branco → <b>sim</b> → <b>não</b> ·
-          em branco não desconta</p>
-        <div class="audNota"><span>Nota da ocorrência</span><b id="nota">—</b></div>
-        <button class="btn" id="btnConcluir">Concluir e avançar</button>
-        <div class="audNav">
-          <button class="btn ghost" id="btnVoltar">← Voltar</button>
-          <button class="btn ghost" id="btnPular">Pular →</button>
+    <div class="marcas">
+      <div class="marcasTit">Qual o conteúdo da foto?</div>
+      <div class="listaCrit" id="listaCrit"></div>
+      <p class="critDica">clique circula: em branco → <b>sim</b> → <b>não</b><br>
+        em branco não desconta</p>
+      <div class="notaCx"><span>Nota da ocorrência</span><b id="nota">5</b></div>
+      <div class="avAcoes">
+        <button class="bt" id="btConcluir">Concluir e avançar</button>
+        <div class="avPar">
+          <button class="bt neutro" id="btVoltar">← Voltar</button>
+          <button class="bt neutro" id="btPular">Pular →</button>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- ============ PAINEL ============ -->
-<div class="view" id="v-historico">
-  <div class="hero"><div class="in">
-    <p class="eyebrow">Produtividade</p>
-    <h1>O que já foi avaliado</h1>
+<!-- ======== PAINEL ======== -->
+<div class="tela" id="t-painel">
+  <div class="topo"><div class="meio largo">
+    <p class="olho">Produtividade</p><h1>O que já foi avaliado</h1>
   </div></div>
-  <div class="container larga" id="painelCorpo"></div>
+  <div class="rola"><div class="meio largo" id="painelCorpo"></div></div>
 </div>
 
-<!-- ============ CONFIGURAÇÕES ============ -->
-<div class="view" id="v-config">
-  <div class="hero"><div class="in">
-    <p class="eyebrow">Ajustes</p>
-    <h1>Configurações</h1>
+<!-- ======== AJUSTES ======== -->
+<div class="tela" id="t-ajustes">
+  <div class="topo"><div class="meio">
+    <p class="olho">Ajustes</p><h1>Configurações</h1>
   </div></div>
-  <div class="container">
-    <label class="f">Planilha de sincronização</label>
-    <input type="text" id="cSync" class="oculto" placeholder="https://script.google.com/…/exec"
-           autocomplete="off" spellcheck="false">
-    <p class="hint">URL do Apps Script publicado. É onde as avaliações são gravadas.</p>
+  <div class="rola"><div class="meio">
+    <div class="campo">
+      <label for="cSync">Planilha de sincronização</label>
+      <input type="text" id="cSync" class="sigilo" placeholder="https://script.google.com/…/exec"
+             autocomplete="off" spellcheck="false">
+      <small>URL do Apps Script publicado. É onde as avaliações são gravadas.</small>
+    </div>
+    <div class="campo">
+      <label for="cSegredo">Senha da planilha</label>
+      <input type="text" id="cSegredo" class="sigilo" placeholder="opcional"
+             autocomplete="off" spellcheck="false">
+    </div>
+    <div class="campo">
+      <label for="cPonte">Endereço da ponte</label>
+      <input type="text" id="cPonte" placeholder="http://localhost:8765" autocomplete="off" spellcheck="false">
+      <small>Programa local que busca as fotos no HubSoft. Em branco, avalia só pelas descrições.</small>
+    </div>
+    <div class="campo">
+      <label for="cNome">Seu nome</label>
+      <input type="text" id="cNome" placeholder="quem está avaliando" autocomplete="off">
+    </div>
+    <div class="linhaBt">
+      <button class="bt" id="btSalvar">Salvar</button>
+      <button class="bt neutro" id="btTestar">Testar a planilha</button>
+    </div>
+    <p class="aviso" id="cfgStatus" style="margin-top:16px" hidden></p>
+  </div></div>
+</div>
 
-    <label class="f">Senha da planilha</label>
-    <input type="text" id="cSegredo" class="oculto" placeholder="opcional"
-           autocomplete="off" spellcheck="false">
-
-    <label class="f">Endereço da ponte</label>
-    <input type="text" id="cPonte" placeholder="http://localhost:8765" autocomplete="off" spellcheck="false">
-    <p class="hint">Programa local que busca as fotos no HubSoft. Em branco, avalia só pelas descrições.</p>
-
-    <label class="f">Seu nome</label>
-    <input type="text" id="cNome" placeholder="quem está avaliando" autocomplete="off">
-
-    <div class="row"><button class="btnFull" id="btnSalvarCfg">Salvar</button></div>
-    <div class="row"><button class="btnFull alt" id="btnTestar">Testar a planilha</button></div>
-    <p class="note" id="cfgStatus" style="margin-top:16px" hidden></p>
-  </div>
 </div>
 
 <div class="leitor" id="leitor" hidden>
-  <div class="leitorCaixa">
+  <div class="leitorCx">
     <header>
-      <div><b id="lerTitulo">Descrição</b><small id="lerSub"></small></div>
+      <div><b id="lerTit">Descrição</b><small id="lerSub"></small></div>
       <button id="lerFechar" aria-label="Fechar">✕</button>
     </header>
-    <div class="textoCorpo leitorTexto" id="lerCorpo"></div>
+    <div class="corpo" id="lerCorpo"></div>
   </div>
 </div>
 
 <div class="toast" id="toast" hidden></div>
 
 <script>
+
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -708,28 +652,28 @@ function aviso(t, ms){
    =========================================================== */
 const TELAS = {
   menu:      {titulo:'Avaliação'},
-  carregar:  {titulo:'Carregar relatório'},
+  arquivo:   {titulo:'Arquivo'},
   lista:     {titulo:'Ordens'},
   aval:      {titulo:'Avaliando'},
-  historico: {titulo:'Produtividade'},
-  config:    {titulo:'Configurações'},
+  painel: {titulo:'Produtividade'},
+  ajustes:   {titulo:'Ajustes'},
 };
 
 const K_TELA = 'avaliador:tela';
 
 function irPara(nome){
-  if(!TELAS[nome]) nome = 'menu';
+  if(!TELAS.includes(nome)) nome = 'capa';
   $$('.view').forEach(v => v.classList.remove('on'));
-  const alvo = $('#v-' + nome);
+  const alvo = $('#t-' + nome);
   if(alvo) alvo.classList.add('on');
 
   // a capa só reaparece quando você clica na casinha
-  const naCapa = nome === 'menu';
-  $('#back').classList.toggle('on', !naCapa);
-  $('#navTopo').classList.toggle('on', !naCapa);
-  $$('#navTopo button').forEach(b=>{
-    const dele = b.dataset.go === nome ||
-                 (nome === 'aval' && b.dataset.go === 'lista');
+  const naCapa = nome === 'capa';
+  $('#btCasa').classList.toggle('on', !naCapa);
+  $('#abas').classList.toggle('on', !naCapa);
+  $$('#abas button').forEach(b=>{
+    const dele = b.dataset.ir === nome ||
+                 (nome === 'aval' && b.dataset.ir === 'lista');
     b.classList.toggle('on', dele);
   });
 
@@ -739,19 +683,19 @@ function irPara(nome){
   window.scrollTo(0, 0);
   if(nome === 'lista') desenharLista();
   if(nome === 'aval') mostrarOrdem();
-  if(nome === 'historico') abrirPainel();
-  if(nome === 'config') escreverConfig();
+  if(nome === 'painel') abrirPainel();
+  if(nome === 'ajustes') escreverConfig();
 }
 
 addEventListener('hashchange', ()=> irPara(location.hash.slice(1)));
 document.addEventListener('click', e=>{
-  const b = e.target.closest && e.target.closest('[data-go]');
-  if(b) location.hash = '#' + b.dataset.go;
+  const b = e.target.closest && e.target.closest('[data-ir]');
+  if(b) location.hash = '#' + b.dataset.ir;
 });
 
 /* A casinha é o único caminho de volta à capa. Nenhuma outra ação
    leva para lá — nem concluir a fila, nem recarregar a página. */
-$('#back').onclick = ()=> location.hash = '#menu';
+$('#btCasa').onclick = ()=> location.hash = '#menu';
 
 /* ===========================================================
    Leitura do relatório
@@ -826,8 +770,8 @@ async function lerArquivo(file){
   const fechadas = fila.filter(o => FECHADA.test(o.status) || o.data).length;
   const total = fila.length;
 
-  $('#carregado').innerHTML = `
-    <div class="note" style="margin-top:16px">
+  $('#lido').innerHTML = `
+    <div class="aviso" style="margin-top:16px">
       <b>${total} ordens lidas</b>
       ${fechadas} com situação de encerrada${col.fechamento < 0
         ? '<br><b style="color:var(--amber)">A coluna de encerramento não foi reconhecida</b>' : ''}
@@ -844,7 +788,7 @@ const soData = t => (String(t||'').match(/(\d{2}\/\d{2}\/\d{4})/) || [,''])[1] |
 const soHora = t => (String(t||'').match(/(\d{2}:\d{2})/) || [,''])[1];
 
 /* ---------- arquivo: soltar ou escolher ---------- */
-const drop = $('#drop');
+const drop = $('#solte');
 drop.onclick = ()=> $('#arquivo').click();
 $('#arquivo').onchange = e => { if(e.target.files[0]) lerArquivo(e.target.files[0]); };
 ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{
@@ -865,43 +809,43 @@ function pendentes(){ return fila.filter(o => !jaAvaliadas.has(String(o.os))); }
 
 function desenharLista(){
   if(!fila.length){
-    $('#listaKpis').innerHTML = '';
-    $('#listaOrdens').innerHTML = '<p class="note alerta"><b>Nada carregado</b>Volte e solte o relatório de finalizadas.</p>';
-    $('#btnComecar').hidden = true;
+    $('#listaNums').innerHTML = '';
+    $('#listaItens').innerHTML = '<p class="aviso amb"><b>Nada carregado</b>Volte e solte o relatório de finalizadas.</p>';
+    $('#btComecar').hidden = true;
     return;
   }
   const pend = pendentes();
   const canceladas = fila.filter(o => /cancel/i.test(o.status)).length;
 
-  $('#listaKpis').innerHTML = `
-    <div class="kpi ${pend.length ? 'meio' : 'bom'}"><b>${pend.length}</b><span>para avaliar</span></div>
-    <div class="kpi bom"><b>${fila.length - pend.length}</b><span>já avaliadas</span></div>
-    ${canceladas ? `<div class="kpi"><b>${canceladas}</b><span>canceladas</span></div>` : ''}`;
+  $('#listaNums').innerHTML = `
+    <div class="numero ${pend.length ? 'amb' : 'verde'}"><b>${pend.length}</b><span>para avaliar</span></div>
+    <div class="numero bom"><b>${fila.length - pend.length}</b><span>já avaliadas</span></div>
+    ${canceladas ? `<div class="numero"><b>${canceladas}</b><span>canceladas</span></div>` : ''}`;
 
-  $('#btnComecar').hidden = !pend.length;
-  $('#btnComecar').textContent = pend.length
+  $('#btComecar').hidden = !pend.length;
+  $('#btComecar').textContent = pend.length
     ? 'Avaliar as ' + pend.length + ' pendentes' : 'Tudo avaliado';
 
-  $('#listaOrdens').innerHTML = fila.map((o,i)=>{
+  $('#listaItens').innerHTML = fila.map((o,i)=>{
     const feita = avaliacoes.find(a => a.os === o.os);
     const naPlanilha = jaAvaliadas.has(String(o.os));
     const nota = feita ? (feita.nota === null ? '—' : feita.nota) : (naPlanilha ? '✓' : '');
     const baixa = feita && feita.nota !== null && feita.nota <= 3;
-    return `<button class="tile ${feita || naPlanilha ? 'feita' : ''} ${baixa ? 'baixa' : ''}" data-ordem="${i}">
-      <span class="ic">${nota || (i+1)}</span>
-      <span><b>${esc(o.cliente || 'sem nome')}</b>
+    return `<button class="item ${feita || naPlanilha ? 'feito' : ''} ${baixa ? 'baixa' : ''}" data-ordem="${i}">
+      <span class="bolha">${nota || (i+1)}</span>
+      <span class="txt"><b>${esc(o.cliente || 'sem nome')}</b>
         <small>OS ${esc(o.os)}${o.tipo ? ' · ' + esc(o.tipo) : ''}${o.data ? ' · ' + esc(o.data) : ''}</small></span>
-      <span class="arrow">›</span>
+      <span class="seta">›</span>
     </button>`;
   }).join('');
 
-  $$('#listaOrdens [data-ordem]').forEach(b => b.onclick = ()=>{
+  $$('#listaItens [data-ordem]').forEach(b => b.onclick = ()=>{
     idx = +b.dataset.ordem;
     location.hash = '#aval';
   });
 }
 
-$('#btnComecar').onclick = ()=>{
+$('#btComecar').onclick = ()=>{
   const p = fila.findIndex(o => !jaAvaliadas.has(String(o.os)));
   idx = p >= 0 ? p : 0;
   location.hash = '#aval';
@@ -926,24 +870,24 @@ function mostrarOrdem(){
       else if(v === 'NÃO') marcas[c.id] = 'nao';
     });
     marcas.ausente = !!feita.ausente;
-    $('#aObs').value = feita.obs || '';
+    $('#fObs').value = feita.obs || '';
   } else {
-    $('#aObs').value = '';
+    $('#fObs').value = '';
   }
 
-  $('#aCliente').textContent = o.cliente || 'sem nome';
-  $('#aCli').textContent  = o.cliente || 'sem nome';
-  $('#aOS').textContent   = 'OS ' + (o.os || '—');
-  $('#aTipo').textContent = o.tipo || 'sem tipo';
-  $('#aData').textContent = [o.data, o.hIni && o.hIni + (o.hFim ? '–' + o.hFim : '')]
+  $('#fNome').textContent = o.cliente || 'sem nome';
+  $('#fNome').textContent  = o.cliente || 'sem nome';
+  $('#fOS').textContent   = 'OS ' + (o.os || '—');
+  $('#fTipo').textContent = o.tipo || 'sem tipo';
+  $('#fData').textContent = [o.data, o.hIni && o.hIni + (o.hFim ? '–' + o.hFim : '')]
     .filter(Boolean).join(' · ') || 'sem data';
 
   etiqueta('#aTecnico', o.tecnico);
   etiqueta('#aContrato', o.contrato && 'contrato ' + o.contrato);
   etiqueta('#aEndereco', o.endereco);
 
-  escreverTexto('#aAbertura', o.abertura);
-  escreverTexto('#aFechamento', o.fechamento);
+  escreverTexto('#fAbertura', o.abertura);
+  escreverTexto('#fFechamento', o.fechamento);
 
   $('#conta').textContent = (idx + 1) + ' / ' + fila.length;
   $('#prog').style.width = Math.round((idx + 1) / fila.length * 100) + '%';
@@ -994,7 +938,7 @@ function escreverTexto(sel, txt){
 function ampliarTexto(qual){
   const o = ordemAtual();
   const txt = qual === 'abertura' ? o.abertura : o.fechamento;
-  $('#lerTitulo').textContent = qual === 'abertura' ? 'Descrição de abertura'
+  $('#lerTit').textContent = qual === 'abertura' ? 'Descrição de abertura'
                                                     : 'Descrição de encerramento';
   $('#lerSub').textContent = (o.cliente || '') + ' · OS ' + o.os;
   escreverTexto('#lerCorpo', txt);
@@ -1002,23 +946,23 @@ function ampliarTexto(qual){
 }
 
 function desenharCriterios(){
-  $('#aCriterios').innerHTML = CRITERIOS.map(c=>{
+  $('#listaCrit').innerHTML = CRITERIOS.map(c=>{
     const e = marcas[c.id];
     const rotulo = e === 'sim' ? 'sim' : e === 'nao' ? 'não' : '';
-    return `<button class="crit ${e || ''} ${c.bonus ? 'bonus' : ''}" data-crit="${c.id}">
-      <span class="tecla">${c.tecla}</span>
-      <span class="nome">${esc(c.rotulo)}</span>
-      <span class="estado">${rotulo}</span>
+    return `<button class="crit ${e || ''}" data-crit="${c.id}">
+      <span class="tcl">${c.tecla}</span>
+      <span class="nm">${esc(c.rotulo)}</span>
+      <span class="st">${rotulo}</span>
     </button>`;
   }).join('') +
   `<button class="crit ausente ${marcas.ausente ? 'on' : ''}" data-ausente="1">
-     <span class="tecla">0</span>
-     <span class="nome">Cliente ausente
+     <span class="tcl">0</span>
+     <span class="nm">Cliente ausente
        <small>anula a pontuação e não entra na média</small></span>
    </button>`;
 
-  $$('#aCriterios [data-crit]').forEach(b => b.onclick = ()=> alternar(b.dataset.crit));
-  const au = $('#aCriterios [data-ausente]');
+  $$('#listaCrit [data-crit]').forEach(b => b.onclick = ()=> alternar(b.dataset.crit));
+  const au = $('#listaCrit [data-ausente]');
   if(au) au.onclick = ()=>{ marcas.ausente = !marcas.ausente; desenharCriterios(); };
 
   const n = calcularNota(marcas);
@@ -1041,11 +985,11 @@ function alternar(id){
 /* ---------- fotos ---------- */
 function mostrarFoto(){
   const o = ordemAtual();
-  const cx = $('#aFotos');
+  const cx = $('#foto');
   if(!o.fotos.length){
     cx.innerHTML = `<div class="vazio">${o.buscou ? 'sem fotos nesta ordem'
       : (ponteViva ? 'buscando no HubSoft…' : 'ponte desligada — avaliando pelas descrições')}</div>`;
-      $('#fotoConta').textContent = '—';
+      $('#fotoQual').textContent = '—';
     return;
   }
   const f = o.fotos[fotoIdx] || o.fotos[0];
@@ -1054,7 +998,7 @@ function mostrarFoto(){
   // clicar amplia: etiquetas de MAC costumam exigir
   const img = cx.querySelector('img');
   if(img) img.onclick = ()=> img.classList.toggle('zoom');
-  $('#fotoConta').textContent = (fotoIdx + 1) + ' / ' + o.fotos.length;
+  $('#fotoQual').textContent = (fotoIdx + 1) + ' / ' + o.fotos.length;
 }
 
 $('#fotoAnt').onclick = ()=>{
@@ -1086,7 +1030,7 @@ function registrar(){
   const o = ordemAtual();
   const linha = {
     os: o.os, cliente: o.cliente, tecnico: o.tecnico, tipo: o.tipo, data: o.data,
-    hIni: o.hIni, hFim: o.hFim, obs: $('#aObs').value.trim(),
+    hIni: o.hIni, hFim: o.hFim, obs: $('#fObs').value.trim(),
     ausente: !!marcas.ausente, nota: calcularNota(marcas),
   };
   CRITERIOS.forEach(c=>{
@@ -1113,21 +1057,21 @@ async function concluir(){
   }
 }
 
-$('#btnIndice').onclick = alternarIndice;
+$('#btIndice').onclick = alternarIndice;
 $('#lerFechar').onclick = ()=> $('#leitor').hidden = true;
 $('#leitor').onclick = e=>{ if(e.target.id === 'leitor') $('#leitor').hidden = true; };
 document.addEventListener('click', e=>{
-  const b = e.target.closest && e.target.closest('[data-expandir]');
-  if(b) ampliarTexto(b.dataset.expandir);
+  const b = e.target.closest && e.target.closest('[data-ampliar]');
+  if(b) ampliarTexto(b.dataset.ampliar);
 });
-$('#audFechar').onclick = ()=> location.hash = '#lista';
-$('#btnPular').onclick = ()=>{
+$('#btSair').onclick = ()=> location.hash = '#lista';
+$('#btPular').onclick = ()=>{
   const prox = fila.findIndex((o,i)=> i > idx && !jaAvaliadas.has(String(o.os)));
   if(prox >= 0){ idx = prox; mostrarOrdem(); }
   else if(idx < fila.length - 1){ idx++; mostrarOrdem(); }
 };
-$('#btnConcluir').onclick = concluir;
-$('#btnVoltar').onclick = ()=>{
+$('#btConcluir').onclick = concluir;
+$('#btVoltar').onclick = ()=>{
   if(idx <= 0) return;
   registrar();
   idx--;
@@ -1135,7 +1079,7 @@ $('#btnVoltar').onclick = ()=>{
 };
 
 addEventListener('keydown', e=>{
-  if(!$('#v-aval').classList.contains('on')) return;
+  if(!$('#t-aval').classList.contains('on')) return;
   if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
 
   const c = CRITERIOS.find(x => x.tecla === e.key);
@@ -1146,7 +1090,7 @@ addEventListener('keydown', e=>{
     return;
   }
   if(e.key === 'Enter'){ e.preventDefault(); concluir(); return; }
-  if(e.key === 'Backspace'){ e.preventDefault(); $('#btnVoltar').click(); return; }
+  if(e.key === 'Backspace'){ e.preventDefault(); $('#btVoltar').click(); return; }
   if(e.key === 'ArrowRight' && ordemAtual().fotos.length > 1){ e.preventDefault(); $('#fotoProx').click(); }
   if(e.key === 'ArrowLeft' && ordemAtual().fotos.length > 1){ e.preventDefault(); $('#fotoAnt').click(); }
 });
@@ -1203,17 +1147,17 @@ function alternarIndice(){
     const feita = avaliacoes.find(a => a.os === o.os);
     const naPlanilha = jaAvaliadas.has(String(o.os));
     const nota = feita ? (feita.nota === null ? '—' : feita.nota) : (naPlanilha ? '✓' : '');
-    return `<button class="idx ${i === idx ? 'atual' : ''} ${feita || naPlanilha ? 'feita' : ''}"
-      data-ir="${i}">
-      <span class="idxN">${i + 1}</span>
-      <span class="idxNome">${esc(o.cliente || o.os)}</span>
-      ${nota ? `<span class="idxNota">${nota}</span>` : ''}
+    return `<button class="idx ${i === idx ? 'atual' : ''} ${feita || naPlanilha ? 'feito' : ''}"
+      data-salta="${i}">
+      <i>${i + 1}</i>
+      <span>${esc(o.cliente || o.os)}</span>
+      ${nota ? `<span class="b">${nota}</span>` : ''}
     </button>`;
   }).join('');
   el.hidden = false;
-  $$('#indice [data-ir]').forEach(b => b.onclick = ()=>{
+  $$('#indice [data-salta]').forEach(b => b.onclick = ()=>{
     registrar();
-    idx = +b.dataset.ir;
+    idx = +b.dataset.salta;
     el.hidden = true;
     mostrarOrdem();
   });
@@ -1251,11 +1195,11 @@ function diaIso(t){
 async function abrirPainel(){
   const alvo = $('#painelCorpo');
   if(!syncLigado()){
-    alvo.innerHTML = '<p class="note alerta"><b>Requer a planilha</b>' +
+    alvo.innerHTML = '<p class="aviso amb"><b>Requer a planilha</b>' +
       'Configure a URL do Apps Script em Configurações.</p>';
     return;
   }
-  alvo.innerHTML = '<div class="carregando"><span></span>Lendo a planilha…</div>';
+  alvo.innerHTML = '<div class="carregando"><i></i>Lendo a planilha…</div>';
   try{
     const r = await syncChamar({acao:'avaliacoes', dias:0});
     dadosPainel = (r.avaliacoes || []).filter(x =>
@@ -1264,13 +1208,13 @@ async function abrirPainel(){
       .filter(x => x.dia);
 
     if(!dadosPainel.length){
-      alvo.innerHTML = '<p class="note alerta"><b>Nada gravado ainda</b>' +
+      alvo.innerHTML = '<p class="aviso amb"><b>Nada gravado ainda</b>' +
         'Avalie as ordens para alimentar este painel.</p>';
       return;
     }
     desenharPainel();
   }catch(e){
-    alvo.innerHTML = '<p class="note erro"><b>Não consegui ler a planilha</b>' +
+    alvo.innerHTML = '<p class="aviso err"><b>Não consegui ler a planilha</b>' +
       esc(e.message) + '</p>';
   }
 }
@@ -1286,29 +1230,29 @@ function desenharPainel(){
 
   $('#painelCorpo').innerHTML = `
     <div class="pnTopo">
-      <div class="pnMedia">
-        <svg viewBox="0 0 120 120" class="pnAnel">
+      <div class="pnAnelCx">
+        <svg viewBox="0 0 120 120" >
           <circle cx="60" cy="60" r="52" fill="none" stroke="#153626" stroke-width="9"/>
           <circle cx="60" cy="60" r="52" fill="none" stroke="${corDaNota(media)}" stroke-width="9"
                   stroke-linecap="round" transform="rotate(-90 60 60)"
                   stroke-dasharray="${2*Math.PI*52}"
-                  stroke-dashoffset="${2*Math.PI*52}" class="anelArco"
+                  stroke-dashoffset="${2*Math.PI*52}" class="pnArco"
                   style="--alvo:${2*Math.PI*52*(1 - Math.min(media,7)/7)}"/>
         </svg>
-        <div class="pnMediaTxt">
+        <div class="pnAnelTxt">
           <b style="color:${corDaNota(media)}">${media.toFixed(1)}</b>
           <span>nota média</span>
         </div>
       </div>
-      <div class="pnNums">
-        <div class="pnNum"><b>${d.length}</b><span>ordens avaliadas</span></div>
-        <div class="pnNum"><b>${tecnicos.length}</b><span>técnicos</span></div>
-        <div class="pnNum"><b>${d.filter(x=>x.pontos<=3).length}</b><span>notas 3 ou menos</span></div>
-        <div class="pnNum"><b>${dias.length}</b><span>dias com registro</span></div>
+      <div class="numeros">
+        <div class="numero"><b>${d.length}</b><span>ordens avaliadas</span></div>
+        <div class="numero"><b>${tecnicos.length}</b><span>técnicos</span></div>
+        <div class="numero"><b>${d.filter(x=>x.pontos<=3).length}</b><span>notas 3 ou menos</span></div>
+        <div class="numero"><b>${dias.length}</b><span>dias com registro</span></div>
       </div>
     </div>
 
-    <div class="pnFiltros">
+    <div class="pnChips">
       <button class="pnChip ${!tecnicoEmFoco ? 'on' : ''}" data-tec="">Todos</button>
       ${tecnicos.map(t=>`<button class="pnChip ${tecnicoEmFoco===t?'on':''}"
         data-tec="${esc(t)}">${esc(t.split(' ')[0])}</button>`).join('')}
@@ -1316,14 +1260,14 @@ function desenharPainel(){
 
     <h2>Cada ponto é uma ordem</h2>
     <p class="pnSub">tempo na horizontal, nota na vertical · passe o mouse</p>
-    <div class="pnCeu" id="pnCeu"></div>
+    <div class="pnCaixa" id="pnCeu"></div>
 
     <h2>O que costuma faltar</h2>
     <p class="pnSub">quanto mais cheio o raio, mais aquele critério é cumprido</p>
-    <div class="pnRosa" id="pnRosa"></div>
+    <div class="pnRosaCx" id="pnRosa"></div>
 
     <h2>Evolução por dia</h2>
-    <div class="pnOnda" id="pnOnda"></div>`;
+    <div class="pnCaixa" id="pnOnda"></div>`;
 
   $$('#painelCorpo [data-tec]').forEach(b => b.onclick = ()=>{
     tecnicoEmFoco = b.dataset.tec || null;
@@ -1541,7 +1485,7 @@ function escreverConfig(){
   $('#cNome').value = cfg.nome || '';
 }
 
-$('#btnSalvarCfg').onclick = ()=>{
+$('#btSalvar').onclick = ()=>{
   const url = $('#cSync').value.trim();
   if(url && !/^https:\/\/script\.google\.com\/.*\/exec/.test(url)){
     mostrarCfg('A URL da planilha deve terminar em /exec.', 'erro');
@@ -1557,7 +1501,7 @@ $('#btnSalvarCfg').onclick = ()=>{
   conferirPlanilha();
 };
 
-$('#btnTestar').onclick = async ()=>{
+$('#btTestar').onclick = async ()=>{
   if(!syncLigado()){ mostrarCfg('Preencha a URL da planilha primeiro.', 'alerta'); return; }
   mostrarCfg('Testando…', '');
   try{
@@ -1570,7 +1514,7 @@ $('#btnTestar').onclick = async ()=>{
 function mostrarCfg(txt, classe){
   const el = $('#cfgStatus');
   el.textContent = txt;
-  el.className = 'note' + (classe ? ' ' + classe : '');
+  el.className = 'aviso' + (classe ? ' ' + classe : '');
   el.hidden = false;
 }
 
@@ -1598,7 +1542,7 @@ function recuperar(){
 }
 
 function atualizarMenu(){
-  const sub = $('#mResumo'), num = $('#mNum');
+  const sub = $('#capaSub'), num = $('#capaNum');
   if(!fila.length){
     num.textContent = '—';
     sub.textContent = 'Carregue o relatório de finalizadas';
@@ -1613,7 +1557,7 @@ function atualizarMenu(){
 function escreverHoje(){
   const d = new Date();
   const semana = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'][d.getDay()];
-  const el = $('#capaHoje');
+  const el = $('#capaData');
   if(el) el.innerHTML = '<b>' + d.toLocaleDateString('pt-BR') + '</b>' + semana;
 }
 
@@ -1625,12 +1569,13 @@ escreverHoje();
 /* Onde abrir: o endereço manda; sem ele, a última tela em que você
    estava; se nunca usou, a capa. */
 const telaInicial = location.hash.slice(1) ||
-  (()=>{ try{ return localStorage.getItem(K_TELA) || 'menu'; }catch(e){ return 'menu'; } })();
-if(!location.hash && telaInicial !== 'menu') location.hash = '#' + telaInicial;
+  (()=>{ try{ return localStorage.getItem(K_TELA) || 'capa'; }catch(e){ return 'capa'; } })();
+if(!location.hash && telaInicial !== 'capa') location.hash = '#' + telaInicial;
 else irPara(telaInicial);
 checarPonte();
 setInterval(checarPonte, 15000);
 conferirPlanilha();
+
 
 </script>
 </body>
