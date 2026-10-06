@@ -364,6 +364,13 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
   .meio,.topo .meio{padding-left:18px;padding-right:18px}
 }
 
+
+/* resposta crua da planilha, para diagnóstico */
+.cru{background:var(--cinza);border-radius:13px;padding:14px 16px;font:12px/1.55 var(--mono);
+  color:var(--tinta2);white-space:pre-wrap;word-break:break-word;max-height:380px;
+  overflow:auto;margin-bottom:10px}
+/* a etiqueta do técnico é quem responde pela ordem */
+.etq#fTecnico{background:var(--verde-f);color:var(--verde-e);font-weight:600}
 </style>
 </head>
 <body>
@@ -869,15 +876,14 @@ function mostrarOrdem(){
   }
 
   $('#fNome').textContent = o.cliente || 'sem nome';
-  $('#fNome').textContent  = o.cliente || 'sem nome';
   $('#fOS').textContent   = 'OS ' + (o.os || '—');
-  $('#fTipo').textContent = o.tipo || 'sem tipo';
-  $('#fData').textContent = [o.data, o.hIni && o.hIni + (o.hFim ? '–' + o.hFim : '')]
-    .filter(Boolean).join(' · ') || 'sem data';
 
-  etiqueta('#aTecnico', o.tecnico);
-  etiqueta('#aContrato', o.contrato && 'contrato ' + o.contrato);
-  etiqueta('#aEndereco', o.endereco);
+  etiqueta('#fTipo', o.tipo);
+  etiqueta('#fData', [o.data, o.hIni && o.hIni + (o.hFim ? '–' + o.hFim : '')]
+    .filter(Boolean).join(' · '));
+  etiqueta('#fTecnico', tecnicoDaOrdem(o));
+  etiqueta('#fPlano', o.plano || (o.contrato && 'contrato ' + o.contrato));
+  etiqueta('#fEndereco', o.endereco);
 
   escreverTexto('#fAbertura', o.abertura);
   escreverTexto('#fFechamento', o.fechamento);
@@ -895,6 +901,18 @@ function etiqueta(sel, txt){
   if(!el) return;
   el.textContent = txt || '';
   el.hidden = !txt;
+}
+
+/* Quando a coluna do técnico não vem no relatório, o nome às vezes
+   está escrito na descrição de encerramento. Melhor isso do que
+   avaliar sem saber de quem é a ordem. */
+function tecnicoDaOrdem(o){
+  if(o.tecnico) return o.tecnico;
+  const t = String(o.fechamento || '');
+  // para no fim da linha ou na primeira pontuação forte
+  const m = t.match(/T[ÉE]CNICO[S]?\s*:?\s*([A-ZÀ-Úa-zà-ú][A-ZÀ-Úa-zà-ú ]{4,44})/i);
+  if(!m) return '';
+  return m[1].split(/[.,;\n|]/)[0].trim();
 }
 
 /* A descrição vem do HubSoft com quebras de linha que importam:
@@ -1022,7 +1040,7 @@ async function buscarFotos(o){
 function registrar(){
   const o = ordemAtual();
   const linha = {
-    os: o.os, cliente: o.cliente, tecnico: o.tecnico, tipo: o.tipo, data: o.data,
+    os: o.os, cliente: o.cliente, tecnico: tecnicoDaOrdem(o), tipo: o.tipo, data: o.data,
     hIni: o.hIni, hFim: o.hFim, obs: $('#fObs').value.trim(),
     ausente: !!marcas.ausente, nota: calcularNota(marcas),
   };
@@ -1195,22 +1213,87 @@ async function abrirPainel(){
   alvo.innerHTML = '<div class="carregando"><i></i>Lendo a planilha…</div>';
   try{
     const r = await syncChamar({acao:'avaliacoes', dias:0});
-    dadosPainel = (r.avaliacoes || []).filter(x =>
-      x.pontos !== null && x.pontos !== '' && x.pontos !== undefined)
+    const brutas = r.avaliacoes || [];
+
+    // conta por que cada linha foi descartada, em vez de só dizer "nada"
+    const semNota = brutas.filter(x =>
+      x.pontos === null || x.pontos === '' || x.pontos === undefined).length;
+    const comNota = brutas.filter(x =>
+      x.pontos !== null && x.pontos !== '' && x.pontos !== undefined);
+    const semData = comNota.filter(x => !diaIso(x.data)).length;
+
+    dadosPainel = comNota
       .map(x => Object.assign({}, x, {pontos: Number(x.pontos), dia: diaIso(x.data)}))
-      .filter(x => x.dia);
+      .filter(x => x.dia && !isNaN(x.pontos));
 
     if(!dadosPainel.length){
-      alvo.innerHTML = '<p class="aviso amb"><b>Nada gravado ainda</b>' +
-        'Avalie as ordens para alimentar este painel.</p>';
+      alvo.innerHTML = diagnosticoPainel(brutas, semNota, semData, r);
       return;
     }
     desenharPainel();
   }catch(e){
     alvo.innerHTML = '<p class="aviso err"><b>Não consegui ler a planilha</b>' +
-      esc(e.message) + '</p>';
+      esc(e.message) + '<br><br>Confira em Ajustes se a URL termina em <b>/exec</b> ' +
+      'e se a implantação está como <i>Qualquer pessoa</i>.</p>';
   }
 }
+
+/* Quando o painel fica vazio, a causa importa: planilha sem linhas,
+   linhas sem nota, ou datas que o leitor não reconheceu. */
+function diagnosticoPainel(brutas, semNota, semData, resposta){
+  if(!brutas.length){
+    return `<p class="aviso amb"><b>A planilha respondeu, mas sem linhas</b>
+      O Apps Script leu a aba <b>produtividade</b> e não encontrou registros.<br><br>
+      Duas causas comuns:<br>
+      • a planilha do Google ainda está vazia — preencher o arquivo .xlsx no
+        computador não altera a planilha online; é preciso subir os dados para lá<br>
+      • o Apps Script está publicado em outra planilha, diferente da que você abriu
+      </p>
+      <div class="linhaBt">
+        <button class="bt neutro" onclick="verRespostaCrua()">Ver a resposta da planilha</button>
+      </div>`;
+  }
+  if(semData && !semNota){
+    return `<p class="aviso amb"><b>${brutas.length} linhas lidas, nenhuma com data válida</b>
+      As notas estão lá, mas a coluna <b>DATA</b> veio num formato que não reconheci.
+      O painel usa a data para posicionar os pontos no tempo.<br><br>
+      Esperado: <b>05/10/2026</b> ou <b>2026-10-05</b>.</p>
+      <div class="linhaBt">
+        <button class="bt neutro" onclick="verRespostaCrua()">Ver a resposta da planilha</button>
+      </div>`;
+  }
+  return `<p class="aviso amb"><b>${brutas.length} linhas lidas, nenhuma aproveitável</b>
+    ${semNota} sem nota preenchida${semData ? ' · ' + semData + ' sem data válida' : ''}.<br><br>
+    Ordens de cliente ausente não entram no painel, por não terem nota.</p>
+    <div class="linhaBt">
+      <button class="bt neutro" onclick="verRespostaCrua()">Ver a resposta da planilha</button>
+    </div>`;
+}
+
+/* Mostra o que a planilha devolveu, cru. É o jeito mais rápido de
+   descobrir se o problema é a planilha ou a leitura. */
+let ultimaResposta = null;
+async function verRespostaCrua(){
+  const alvo = $('#painelCorpo');
+  alvo.innerHTML = '<div class="carregando"><i></i>Consultando…</div>';
+  try{
+    const r = await syncChamar({acao:'avaliacoes', dias:0});
+    ultimaResposta = r;
+    const a = r.avaliacoes || [];
+    alvo.innerHTML = `
+      <div class="aviso"><b>Resposta da planilha</b>
+        ${a.length} linha(s) na aba produtividade</div>
+      ${a.length ? `<h2>Três primeiras, como chegaram</h2>
+        <div class="cru">${esc(JSON.stringify(a.slice(0,3), null, 2))}</div>` : ''}
+      <h2>Resposta completa</h2>
+      <div class="cru">${esc(JSON.stringify(r, null, 2).slice(0, 4000))}</div>
+      <div class="linhaBt"><button class="bt" onclick="abrirPainel()">Voltar ao painel</button></div>`;
+  }catch(e){
+    alvo.innerHTML = '<p class="aviso err"><b>A consulta falhou</b>' + esc(e.message) + '</p>';
+  }
+}
+window.verRespostaCrua = verRespostaCrua;
+window.abrirPainel = abrirPainel;
 
 function desenharPainel(){
   const d = tecnicoEmFoco
