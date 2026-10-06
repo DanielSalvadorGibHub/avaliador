@@ -372,64 +372,6 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
 /* a etiqueta do técnico é quem responde pela ordem */
 .etq#fTecnico{background:var(--verde-f);color:var(--verde-e);font-weight:600}
 
-/* ---------- pódio ---------- */
-.podio{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:end;
-  margin:14px 0 10px;max-width:620px}
-.podioCol{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
-  padding:16px 10px 0;border-radius:16px 16px 0 0;background:var(--cinza);
-  transition:background .16s;position:relative}
-.podioCol:hover{background:var(--cinza2)}
-.podioCol.alto{padding-top:30px}
-.podioCol.medio{padding-top:22px}
-.podioMedalha{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
-  font:700 15px var(--ui);color:#fff;margin-bottom:4px}
-.podioMedalha.pos1{background:linear-gradient(145deg,#F5C842,#D9A520);
-  box-shadow:0 2px 10px rgba(217,165,32,.4)}
-.podioMedalha.pos2{background:linear-gradient(145deg,#C8CCD0,#9BA1A6)}
-.podioMedalha.pos3{background:linear-gradient(145deg,#D99B6C,#B57647)}
-.podioNome{font:600 13.5px var(--ui);text-align:center;line-height:1.3}
-.podioNota{font:700 22px var(--ui);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.podioSub{font-size:11.5px;color:var(--tinta3)}
-.podioBase{width:100%;height:10px}
-.podioResto{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--tinta2);
-  padding:10px 2px 0;border-top:1px solid var(--cinza2);max-width:620px}
-.podioResto span{cursor:pointer}
-.podioResto span:hover{color:var(--tinta)}
-.podioResto b{color:var(--tinta3);font-weight:500;font-size:11.5px}
-.podioResto i{font-style:normal;font-weight:700;margin-left:3px}
-
-/* ---------- tabela de técnicos ---------- */
-.tabela{display:flex;flex-direction:column}
-.th,.tr{display:grid;grid-template-columns:28px minmax(130px,1.5fr) 150px 52px 48px 54px 44px minmax(120px,1fr);
-  gap:10px;align-items:center;padding:9px 4px}
-.th{font:600 10.5px var(--ui);text-transform:uppercase;letter-spacing:.05em;color:var(--tinta3);
-  border-bottom:1px solid var(--linha)}
-.tr{border-bottom:1px solid var(--cinza2);cursor:pointer;transition:background .14s}
-.tr:last-child{border-bottom:0}
-.tr:hover{background:var(--cinza)}
-.tr .pos{font:500 12px var(--mono);color:var(--tinta3);text-align:center}
-.tr .nome{display:flex;flex-direction:column;min-width:0;font-size:14px;font-weight:500;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tr .nome small{font-size:11px;color:var(--tinta3);font-weight:400}
-.barraCx{display:flex;align-items:center;gap:8px}
-.barraCx i{flex:1;height:7px;background:var(--cinza2);border-radius:4px;position:relative;
-  overflow:hidden}
-.barraCx i::after{content:'';position:absolute;inset:0 auto 0 0;width:0;border-radius:4px;
-  background:inherit;animation:crescer .9s cubic-bezier(.32,.72,0,1) forwards}
-.barraCx b{font:700 14px var(--ui);font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
-@keyframes crescer{to{width:var(--larg)}}
-.th .num,.tr .num{text-align:right;font:500 13px var(--mono);color:var(--tinta2)}
-.th .num{font-family:var(--ui)}
-.tr .num.alerta{color:var(--ambar);font-weight:600}
-.tr .num.ruim{color:var(--vermelho);font-weight:600}
-.tr .falha{font-size:12px;color:var(--tinta3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tr .falha i{font-style:normal;color:var(--vermelho);font-weight:600}
-@media(max-width:900px){
-  .th,.tr{grid-template-columns:24px 1fr 90px 44px 40px}
-  .th span:nth-child(n+6),.tr span:nth-child(n+6){display:none}
-  .barraCx i{display:none}
-}
-
 /* ---------- critérios esquecidos ---------- */
 .dupla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 @media(max-width:860px){.dupla{grid-template-columns:1fr}}
@@ -454,6 +396,85 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
 .baixaFalt{font-size:11.5px;color:var(--vermelho);margin-top:2px}
 
 .pnChip i{font-style:normal;font-weight:700;margin-left:5px;opacity:.65}
+
+/* ---------- número principal ---------- */
+.heroi{position:relative;display:flex;align-items:center;gap:30px;flex-wrap:wrap;
+  background:linear-gradient(135deg,#0B0B0D,#18181C);border-radius:24px;
+  padding:30px 34px;margin:6px 0 26px;overflow:hidden;color:#fff}
+.heroiLuz{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(420px 220px at 12% 0%, var(--brilho), transparent 65%)}
+.heroiNum{position:relative;z-index:2;flex:0 0 auto}
+.heroiNum b{display:block;font-size:68px;font-weight:700;letter-spacing:-.05em;line-height:.92;
+  background:linear-gradient(135deg,var(--c),var(--c2));-webkit-background-clip:text;
+  background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.heroiNum span{font-size:13px;color:#9A9AA0;display:block;margin-top:6px}
+.heroiLado{position:relative;z-index:2;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:18px;flex:1;min-width:260px}
+.heroiLinha em{display:block;font-style:normal;font-size:22px;font-weight:700;
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.heroiLinha span{font-size:11.5px;color:#86868B}
+
+/* ---------- elos ---------- */
+.elos{display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:12px;margin:14px 0 8px}
+.eloCard{position:relative;background:var(--cinza);border-radius:18px;padding:18px 16px 14px;
+  text-align:center;overflow:hidden;transition:transform .18s}
+.eloCard::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(180px 100px at 50% -10%, var(--brilho), transparent 70%)}
+.eloCard:hover{transform:translateY(-2px)}
+.eloCard.vazio{opacity:.5}
+.eloIcone{width:46px;height:46px;margin:0 auto 7px;position:relative;z-index:2}
+.eloIcone svg{width:100%;height:100%;filter:drop-shadow(0 3px 7px var(--brilho))}
+.eloNome{font:700 15px var(--ui);letter-spacing:-.02em;position:relative;z-index:2}
+.eloFaixa{font:500 11px var(--mono);color:var(--tinta3);margin-bottom:9px;position:relative;z-index:2}
+.eloGente{display:flex;flex-direction:column;gap:3px;position:relative;z-index:2}
+.eloGente span{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;
+  background:rgba(255,255,255,.75);border-radius:8px;padding:4px 9px;cursor:pointer;
+  transition:background .14s}
+.eloGente span:hover{background:#fff}
+.eloGente b{font-variant-numeric:tabular-nums;color:var(--tinta2)}
+.eloGente i{font-size:11.5px;color:var(--tinta3);font-style:normal}
+
+/* ---------- ranking ---------- */
+.ranking{display:flex;flex-direction:column;gap:9px}
+.rk{display:grid;grid-template-columns:34px 44px minmax(0,1fr) 128px;gap:14px;align-items:center;
+  background:var(--branco);border:1px solid var(--cinza2);border-radius:16px;padding:14px 18px;
+  cursor:pointer;transition:border-color .16s,transform .16s,box-shadow .16s;position:relative;
+  overflow:hidden}
+.rk::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(var(--c),var(--c2))}
+.rk:hover{border-color:var(--linha);transform:translateX(2px);box-shadow:var(--sombra)}
+.rkPos{font:700 17px var(--ui);color:var(--tinta3);text-align:center;font-variant-numeric:tabular-nums}
+.rkMedalha{width:40px;height:40px}
+.rkMedalha svg{width:100%;height:100%;filter:drop-shadow(0 2px 6px var(--brilho))}
+.rkMeio{min-width:0}
+.rkNome{font:600 15.5px var(--ui);letter-spacing:-.02em;display:flex;align-items:center;gap:8px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rkElo{font:700 10px var(--ui);text-transform:uppercase;letter-spacing:.07em;
+  background:linear-gradient(135deg,var(--c),var(--c2));color:#fff;border-radius:980px;
+  padding:3px 9px;flex:0 0 auto}
+.rkBarra{height:7px;background:var(--cinza2);border-radius:4px;overflow:hidden;margin:7px 0 6px}
+.rkBarra i{display:block;height:100%;width:0;border-radius:4px;
+  background:linear-gradient(90deg,var(--c),var(--c2));
+  animation:crescer 1s cubic-bezier(.32,.72,0,1) forwards}
+@keyframes crescer{to{width:var(--larg)}}
+.rkDetalhe{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--tinta3)}
+.rkDetalhe b{color:var(--tinta2);font-weight:600;font-variant-numeric:tabular-nums}
+.rkDetalhe .ruim b{color:var(--vermelho)}
+.rkDetalhe .falta{color:var(--tinta3)}
+.rkDetalhe .falta b{color:var(--ambar)}
+.rkPontos{text-align:right}
+.rkPontos b{display:block;font:700 27px var(--ui);letter-spacing:-.03em;line-height:1;
+  font-variant-numeric:tabular-nums;color:var(--tinta)}
+.rkPontos span{font-size:11px;color:var(--tinta3);display:block;margin-top:1px}
+.rkPontos i{display:block;font-style:normal;font-size:11px;color:var(--tinta3);margin-top:5px}
+.rkPontos i.topo{color:var(--c2);font-weight:600}
+
+@media(max-width:820px){
+  .rk{grid-template-columns:28px 36px minmax(0,1fr);row-gap:8px}
+  .rkPontos{grid-column:1 / -1;text-align:left;display:flex;align-items:baseline;gap:8px}
+  .rkPontos b{font-size:22px} .rkPontos i{margin:0 0 0 auto}
+  .heroiNum b{font-size:52px}
+}
 </style>
 </head>
 <body>
@@ -518,7 +539,7 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
     <footer class="capaPe">
       <span class="capaQuem"><i>DS</i>
         <div><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></div></span>
-      <span class="capaVer">versão 7 · documento interno</span>
+      <span class="capaVer">versão 8 · documento interno</span>
     </footer>
   </div>
 </div>
@@ -1261,52 +1282,73 @@ function alternarIndice(){
 /* ===========================================================
    Painel de produtividade
 
-   Lê tudo que está na aba produtividade e responde as perguntas
-   que o gestor faz: quem está bem, quem precisa de conversa, o
-   que a equipe mais esquece e como isso evolui.
+   A métrica principal é a soma dos pontos: ela junta volume e
+   qualidade num número só. A média entra como leitura de apoio,
+   porque quem faz poucas ordens pode ter média alta sem ter
+   produzido muito.
    =========================================================== */
 let dadosPainel = [];
 let tecnicoEmFoco = null;
-let ultimaResposta = null;
 
 const FAIXAS = [
-  {min: 6,  cor:'#1E8A2E', nome:'excelente'},
-  {min: 5,  cor:'#34C759', nome:'completa'},
-  {min: 4,  cor:'#9A6700', nome:'faltou algo'},
-  {min: 0,  cor:'#C7362F', nome:'abaixo'},
+  {min: 6, cor:'#1E8A2E'}, {min: 5, cor:'#34C759'},
+  {min: 4, cor:'#9A6700'}, {min: 0, cor:'#C7362F'},
 ];
 const corDaNota = n => (FAIXAS.find(f => n >= f.min) || FAIXAS[3]).cor;
 
+/* Os elos vão pela soma de pontos do período. Um técnico sobe de
+   elo fazendo mais ordens, fazendo-as melhor, ou os dois. */
+const ELOS = [
+  {nome:'Diamante', min:80, cor:'#38BDF8', cor2:'#0EA5E9', brilho:'rgba(56,189,248,.35)'},
+  {nome:'Ouro',     min:50, cor:'#F5C842', cor2:'#D9A520', brilho:'rgba(217,165,32,.35)'},
+  {nome:'Prata',    min:25, cor:'#C8CCD0', cor2:'#9BA1A6', brilho:'rgba(155,161,166,.3)'},
+  {nome:'Bronze',   min:0,  cor:'#D99B6C', cor2:'#B57647', brilho:'rgba(181,118,71,.3)'},
+];
+const eloDe = soma => ELOS.find(e => soma >= e.min) || ELOS[3];
+function proximoElo(soma){
+  const i = ELOS.findIndex(e => soma >= e.min);
+  return i > 0 ? ELOS[i - 1] : null;
+}
+
 /* A data chega de muitos jeitos: texto ISO, brasileiro, número de
-   série do Sheets, ou o toString() de um Date do Apps Script —
-   "Fri Oct 02 2026 04:00:00 GMT-0300". Usa as partes locais, porque
-   converter para UTC pode empurrar a data para o dia seguinte. */
+   série do Sheets, ou o toString() de um Date do Apps Script. Usa as
+   partes locais — converter para UTC empurraria a madrugada para o
+   dia anterior. */
 function diaIso(t){
   if(t === null || t === undefined || t === '') return '';
-
   const local = d => d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2,'0') + '-' +
-    String(d.getDate()).padStart(2,'0');
-
+    String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   if(t instanceof Date) return isNaN(t) ? '' : local(t);
 
   const n = typeof t === 'number' ? t
     : (/^\d{4,6}(\.\d+)?$/.test(String(t).trim()) ? Number(t) : null);
-  if(n !== null && n > 20000 && n < 80000){
+  if(n !== null && n > 20000 && n < 80000)
     return local(new Date(Date.UTC(1899, 11, 30) + Math.round(n) * 86400000));
-  }
 
   const s = String(t).trim();
   let m = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
   if(m) return m[3] + '-' + m[2].padStart(2,'0') + '-' + m[1].padStart(2,'0');
   m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
   if(m) return m[1] + '-' + m[2].padStart(2,'0') + '-' + m[3].padStart(2,'0');
-
   const d = new Date(s);
   return isNaN(d) ? '' : local(d);
 }
-
 const brData = iso => iso ? iso.slice(8) + '/' + iso.slice(5,7) : '';
+
+/* Ordem com dois técnicos: o primeiro nome é quem encerrou, e é a
+   ele que a nota pertence. */
+function responsavel(txt){
+  const t = String(txt || '').trim();
+  if(!t) return 'sem técnico';
+  return t.split(/\s*[,;\/]\s*|\s+e\s+/i)[0].trim() || t;
+}
+
+const NOMES_CRIT = {
+  sinal_interno:'Sinal interno', sinal_externo:'Sinal externo',
+  cadastro:'Atualizou cadastro', mac_antigo:'MAC antigo', mac_novo:'MAC novo',
+  velocidade:'Teste de velocidade', problema:'Foto do problema',
+  cto:'Mexeu na CTO', avaliacao:'Avaliação do cliente',
+};
 
 async function abrirPainel(){
   const alvo = $('#painelCorpo');
@@ -1318,36 +1360,31 @@ async function abrirPainel(){
   alvo.innerHTML = '<div class="carregando"><i></i>Lendo a planilha…</div>';
   try{
     const r = await syncChamar({acao:'avaliacoes', dias:0});
-    ultimaResposta = r;
     const brutas = r.avaliacoes || [];
-
     if(!brutas.length){
       alvo.innerHTML = `<p class="aviso amb"><b>A planilha respondeu, mas sem linhas</b>
-        O Apps Script leu a aba <b>produtividade</b> e não encontrou registros.</p>
+        O Apps Script leu a aba produtividade e não encontrou registros.</p>
         <div class="linhaBt"><button class="bt neutro" onclick="verRespostaCrua()">
           Ver a resposta da planilha</button></div>`;
       return;
     }
 
-    // tudo entra: as ausentes contam como ausência, não como nota
     dadosPainel = brutas.map(x=>{
       const p = (x.pontos === null || x.pontos === '' || x.pontos === undefined)
         ? null : Number(x.pontos);
       return {
         os: String(x.os || ''), cliente: x.cliente || '', tipo: x.tipo || '',
-        tecnico: (x.tecnico || 'sem técnico').trim(),
+        tecnico: responsavel(x.tecnico),
+        tecnicoBruto: String(x.tecnico || '').trim(),
         nota: (p === null || isNaN(p)) ? null : p,
-        ausente: /AUSENTE/i.test(String(x.status || '') + String(x.tipo || '')),
-        criterios: x.criterios || {},
-        obs: x.obs || '',
-        dia: diaIso(x.data),
+        ausente: /AUSENTE/i.test(String(x.status || '') + ' ' + String(x.tipo || '')),
+        criterios: x.criterios || {}, obs: x.obs || '', dia: diaIso(x.data),
       };
     });
-
     desenharPainel();
   }catch(e){
     alvo.innerHTML = '<p class="aviso err"><b>Não consegui ler a planilha</b>' +
-      esc(e.message) + '<br><br>Confira em Ajustes se a URL termina em <b>/exec</b>.</p>';
+      esc(e.message) + '</p>';
   }
 }
 
@@ -1357,53 +1394,48 @@ async function verRespostaCrua(){
   try{
     const r = await syncChamar({acao:'avaliacoes', dias:0});
     const a = r.avaliacoes || [];
-    alvo.innerHTML = `
-      <div class="aviso"><b>Resposta da planilha</b>${a.length} linha(s)</div>
+    alvo.innerHTML = `<div class="aviso"><b>Resposta da planilha</b>${a.length} linha(s)</div>
       <div class="cru">${esc(JSON.stringify(a.slice(0,3), null, 2))}</div>
-      <div class="linhaBt"><button class="bt" onclick="abrirPainel()">Voltar ao painel</button></div>`;
+      <div class="linhaBt"><button class="bt" onclick="abrirPainel()">Voltar</button></div>`;
   }catch(e){
     alvo.innerHTML = '<p class="aviso err"><b>A consulta falhou</b>' + esc(e.message) + '</p>';
   }
 }
 window.verRespostaCrua = verRespostaCrua;
 window.abrirPainel = abrirPainel;
-window.focarTecnico = nome => { tecnicoEmFoco = nome || null; desenharPainel(); };
+window.focarTecnico = n => { tecnicoEmFoco = n || null; desenharPainel(); };
 
-/* ---------- agregação por técnico ---------- */
+/* ---------- agregação ---------- */
 function porTecnico(d){
   const m = {};
   d.forEach(x=>{
     const o = m[x.tecnico] = m[x.tecnico] || {
-      nome: x.tecnico, total: 0, avaliadas: 0, ausentes: 0,
-      soma: 0, baixas: 0, excelentes: 0, notas: [], dias: new Set(), falhas: {},
+      nome: x.tecnico, total: 0, avaliadas: 0, ausentes: 0, soma: 0,
+      baixas: 0, excelentes: 0, dias: new Set(), falhas: {}, parcerias: 0,
     };
     o.total++;
-    o.dias.add(x.dia);
-    if(x.ausente || x.nota === null){ o.ausentes++; }
-    else {
-      o.avaliadas++; o.soma += x.nota; o.notas.push(x.nota);
-      if(x.nota <= 3) o.baixas++;
-      if(x.nota >= 6) o.excelentes++;
-      Object.entries(x.criterios).forEach(([k,v])=>{
-        if(String(v).toUpperCase() === 'NÃO') o.falhas[k] = (o.falhas[k]||0) + 1;
-      });
-    }
+    if(x.dia) o.dias.add(x.dia);
+    if(/[,;\/]|\s+e\s+/i.test(x.tecnicoBruto)) o.parcerias++;
+
+    if(x.nota === null){ o.ausentes++; return; }
+    o.avaliadas++; o.soma += x.nota;
+    if(x.nota <= 3) o.baixas++;
+    if(x.nota >= 6) o.excelentes++;
+    Object.entries(x.criterios).forEach(([k,v])=>{
+      if(String(v).toUpperCase() === 'NÃO') o.falhas[k] = (o.falhas[k]||0) + 1;
+    });
   });
+
   return Object.values(m).map(o=>{
     o.media = o.avaliadas ? o.soma / o.avaliadas : 0;
     o.taxaAusente = o.total ? o.ausentes / o.total : 0;
     o.pior = Object.entries(o.falhas).sort((a,b)=> b[1]-a[1])[0] || null;
-    o.dias = [...o.dias].filter(Boolean).length;
+    o.diasN = o.dias.size;
+    o.elo = eloDe(o.soma);
+    o.proximo = proximoElo(o.soma);
     return o;
-  }).sort((a,b)=> b.media - a.media || b.avaliadas - a.avaliadas);
+  }).sort((a,b)=> b.soma - a.soma || b.media - a.media);   // soma é a métrica principal
 }
-
-const NOMES_CRIT = {
-  sinal_interno:'Sinal interno', sinal_externo:'Sinal externo',
-  cadastro:'Atualizou cadastro', mac_antigo:'MAC antigo', mac_novo:'MAC novo',
-  velocidade:'Teste de velocidade', problema:'Foto do problema',
-  cto:'Mexeu na CTO', avaliacao:'Avaliação do cliente',
-};
 
 function desenharPainel(){
   const todos = dadosPainel;
@@ -1414,56 +1446,50 @@ function desenharPainel(){
   const soma = comNota.reduce((s,x)=> s + x.nota, 0);
   const media = comNota.length ? soma / comNota.length : 0;
   const equipe = porTecnico(todos);
-  const foco = porTecnico(d);
   const comDia = d.filter(x => x.dia);
   const dias = [...new Set(comDia.map(x => x.dia))].sort();
   const semData = d.length - comDia.length;
+  const elo = eloDe(soma);
 
   $('#painelCorpo').innerHTML = `
-    ${barraFiltro(equipe)}
+    <div class="pnChips">
+      <button class="pnChip ${!tecnicoEmFoco ? 'on' : ''}" onclick="focarTecnico('')">
+        Toda a equipe</button>
+      ${equipe.map(t=>`<button class="pnChip ${tecnicoEmFoco === t.nome ? 'on' : ''}"
+        onclick="focarTecnico('${esc(t.nome).replace(/'/g, "\\'")}')">
+        ${esc(primeiroNome(t.nome))} <i>${t.soma}</i></button>`).join('')}
+    </div>
 
-    <div class="pnTopo">
-      <div class="pnAnelCx">
-        <svg viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="52" fill="none" stroke="#EBEBED" stroke-width="9"/>
-          <circle cx="60" cy="60" r="52" fill="none" stroke="${corDaNota(media)}" stroke-width="9"
-                  stroke-linecap="round" transform="rotate(-90 60 60)"
-                  stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52}"
-                  class="pnArco" style="--alvo:${2*Math.PI*52*(1 - Math.min(media,7)/7)}"/>
-        </svg>
-        <div class="pnAnelTxt">
-          <b style="color:${corDaNota(media)}">${media.toFixed(2)}</b>
-          <span>nota média</span>
-        </div>
+    <div class="heroi" style="--c:${elo.cor};--c2:${elo.cor2};--brilho:${elo.brilho}">
+      <div class="heroiLuz"></div>
+      <div class="heroiNum">
+        <b>${soma}</b>
+        <span>pontos somados${tecnicoEmFoco ? '' : ' pela equipe'}</span>
       </div>
-      <div class="numeros" style="flex:1;min-width:300px">
-        <div class="numero"><b>${d.length}</b><span>ordens no período</span></div>
-        <div class="numero verde"><b>${comNota.length}</b><span>avaliadas</span></div>
-        <div class="numero amb"><b>${ausentes.length}</b><span>cliente ausente</span></div>
-        <div class="numero"><b>${soma.toFixed(0)}</b><span>soma dos pontos</span></div>
-        <div class="numero ${comNota.filter(x=>x.nota<=3).length ? 'vm' : ''}">
-          <b>${comNota.filter(x=>x.nota<=3).length}</b><span>notas 3 ou menos</span></div>
-        <div class="numero"><b>${dias.length}</b><span>dias com registro</span></div>
+      <div class="heroiLado">
+        <div class="heroiLinha"><em>${media.toFixed(2)}</em><span>nota média</span></div>
+        <div class="heroiLinha"><em>${comNota.length}</em><span>ordens avaliadas</span></div>
+        <div class="heroiLinha"><em>${ausentes.length}</em><span>cliente ausente</span></div>
+        <div class="heroiLinha"><em>${d.length}</em><span>ordens no total</span></div>
       </div>
     </div>
 
     ${semData ? `<p class="aviso amb" style="margin-bottom:16px">
       <b>${semData} ordens sem data reconhecida</b>
-      Entram na média e no ranking, mas ficam fora dos gráficos de tempo.</p>` : ''}
+      Entram nos números, mas ficam fora dos gráficos de tempo.</p>` : ''}
 
-    ${!tecnicoEmFoco && equipe.length > 2 ? podio(equipe) : ''}
+    ${!tecnicoEmFoco ? pergaminhoElos(equipe) : ''}
 
-    <h2>Desempenho por técnico</h2>
-    <p class="pnSub">clique num nome para ver só as ordens dele</p>
-    <div class="pnCaixa"><div class="tabela" id="pnTabela"></div></div>
+    <h2>Ranking por pontos</h2>
+    <p class="pnSub">a barra mostra o caminho até o próximo elo · clique num nome para filtrar</p>
+    <div class="ranking" id="pnRanking"></div>
 
     ${comDia.length ? `
       <h2>Cada ponto é uma ordem</h2>
-      <p class="pnSub">tempo na horizontal, nota na vertical · passe o mouse</p>
+      <p class="pnSub">tempo na horizontal, nota na vertical · as ausentes aparecem na base</p>
       <div class="pnCaixa" id="pnCeu"></div>` : ''}
 
     <h2>O que mais falta nas ordens</h2>
-    <p class="pnSub">quanto mais cheio o raio, mais aquele critério é cumprido</p>
     <div class="dupla">
       <div class="pnRosaCx" id="pnRosa"></div>
       <div class="pnCaixa" id="pnFalhas"></div>
@@ -1471,113 +1497,119 @@ function desenharPainel(){
 
     ${dias.length > 1 ? `
       <h2>Evolução por dia</h2>
-      <p class="pnSub">média diária e volume de ordens</p>
       <div class="pnCaixa" id="pnOnda"></div>` : ''}
 
     <h2>Ordens com nota baixa</h2>
-    <p class="pnSub">3 pontos ou menos — vale conferir o que faltou</p>
     <div class="pnCaixa"><div id="pnBaixas"></div></div>
 
     <div class="linhaBt">
-      <button class="bt neutro" onclick="exportarPainel()">Exportar este painel (CSV)</button>
+      <button class="bt neutro" onclick="exportarPainel()">Exportar (CSV)</button>
       <button class="bt neutro" onclick="verRespostaCrua()">Ver a resposta da planilha</button>
     </div>`;
 
-  desenharTabela(foco, equipe);
-  if(comDia.length) desenharCeu(comDia);
+  desenharRanking(tecnicoEmFoco ? porTecnico(d) : equipe);
+  if(comDia.length) desenharCeu(d);
   desenharRosa(d);
   desenharFalhas(d);
   if(dias.length > 1) desenharOnda(comDia);
   desenharBaixas(comNota);
 }
 
-function barraFiltro(equipe){
-  return `<div class="pnChips">
-    <button class="pnChip ${!tecnicoEmFoco ? 'on' : ''}" onclick="focarTecnico('')">
-      Toda a equipe</button>
-    ${equipe.map(t=>`<button class="pnChip ${tecnicoEmFoco === t.nome ? 'on' : ''}"
-      onclick="focarTecnico('${esc(t.nome).replace(/'/g, "\\'")}')">
-      ${esc(primeiroNome(t.nome))} <i>${t.media.toFixed(1)}</i></button>`).join('')}
+const primeiroNome = n => String(n).split(/\s+/).slice(0,2).join(' ');
+
+/* ---------- os elos ---------- */
+function pergaminhoElos(equipe){
+  const porElo = ELOS.map(e => ({
+    elo: e, gente: equipe.filter(t => t.elo.nome === e.nome),
+  }));
+  return `
+  <h2>Elos da equipe</h2>
+  <p class="pnSub">pela soma de pontos no período</p>
+  <div class="elos">
+    ${porElo.map(({elo, gente})=>`
+      <div class="eloCard ${gente.length ? '' : 'vazio'}"
+           style="--c:${elo.cor};--c2:${elo.cor2};--brilho:${elo.brilho}">
+        <div class="eloIcone">${medalhaSvg(elo)}</div>
+        <div class="eloNome">${elo.nome}</div>
+        <div class="eloFaixa">${elo.min ? elo.min + '+ pontos' : 'até ' + (ELOS[2].min - 1)}</div>
+        <div class="eloGente">
+          ${gente.length ? gente.map(t=>`<span onclick="focarTecnico('${esc(t.nome).replace(/'/g,"\\'")}')">
+            ${esc(primeiroNome(t.nome))}<b>${t.soma}</b></span>`).join('')
+          : '<i>ninguém aqui</i>'}
+        </div>
+      </div>`).join('')}
   </div>`;
 }
 
-const primeiroNome = n => String(n).split(/\s+/).slice(0,2).join(' ');
-
-/* ---------- pódio ---------- */
-function podio(equipe){
-  const top = equipe.filter(t => t.avaliadas >= 3).slice(0, 5);
-  if(top.length < 3) return '';
-  const ordem = [top[1], top[0], top[2]].filter(Boolean);   // 2º, 1º, 3º
-  const alturas = {0:'baixo', 1:'alto', 2:'medio'};
-
-  return `
-  <h2>Os melhores da equipe</h2>
-  <p class="pnSub">entre quem tem ao menos três ordens avaliadas</p>
-  <div class="podio">
-    ${ordem.map((t,i)=>{
-      const pos = equipe.indexOf(t) + 1;
-      return `<div class="podioCol ${alturas[i]}" onclick="focarTecnico('${esc(t.nome).replace(/'/g,"\\'")}')">
-        <div class="podioMedalha pos${pos}">${pos}</div>
-        <div class="podioNome">${esc(primeiroNome(t.nome))}</div>
-        <div class="podioNota" style="color:${corDaNota(t.media)}">${t.media.toFixed(2)}</div>
-        <div class="podioSub">${t.avaliadas} ordens</div>
-        <div class="podioBase"></div>
-      </div>`;
-    }).join('')}
-  </div>
-  ${top.length > 3 ? `<div class="podioResto">
-    ${top.slice(3).map((t,i)=>`<span onclick="focarTecnico('${esc(t.nome).replace(/'/g,"\\'")}')">
-      <b>${equipe.indexOf(t)+1}º</b> ${esc(primeiroNome(t.nome))}
-      <i style="color:${corDaNota(t.media)}">${t.media.toFixed(2)}</i></span>`).join('')}
-  </div>` : ''}`;
+function medalhaSvg(elo){
+  return `<svg viewBox="0 0 48 48" fill="none">
+    <defs><linearGradient id="g${elo.nome}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${elo.cor}"/><stop offset="100%" stop-color="${elo.cor2}"/>
+    </linearGradient></defs>
+    ${elo.nome === 'Diamante'
+      ? `<path d="M24 5 41 19 24 43 7 19Z" fill="url(#g${elo.nome})"/>
+         <path d="M24 5 41 19H7Z" fill="#fff" opacity=".22"/>
+         <path d="M17 19 24 43 31 19Z" fill="#fff" opacity=".12"/>`
+      : `<circle cx="24" cy="26" r="15" fill="url(#g${elo.nome})"/>
+         <circle cx="24" cy="26" r="10.5" fill="#fff" opacity=".16"/>
+         <path d="M15 4h7l-3 11-6-2Zm18 0h-7l3 11 6-2Z" fill="url(#g${elo.nome})" opacity=".8"/>`}
+  </svg>`;
 }
 
-/* ---------- tabela por técnico ---------- */
-function desenharTabela(foco, equipe){
-  const alvo = $('#pnTabela');
+/* ---------- ranking ---------- */
+function desenharRanking(lista){
+  const alvo = $('#pnRanking');
   if(!alvo) return;
-  const lista = tecnicoEmFoco ? foco : equipe;
-  const maior = Math.max(7, ...lista.map(t => t.media));
+  const maior = Math.max(1, ...lista.map(t => t.soma));
 
-  alvo.innerHTML = `
-    <div class="th">
-      <span></span><span>Técnico</span><span>Média</span><span class="num">Aval.</span>
-      <span class="num">Aus.</span><span class="num">Soma</span><span class="num">≤3</span>
-      <span>Mais esquece</span>
-    </div>
-    ${lista.map((t,i)=>`
-      <div class="tr" onclick="focarTecnico('${esc(t.nome).replace(/'/g,"\\'")}')">
-        <span class="pos">${i + 1}</span>
-        <span class="nome">${esc(t.nome)}
-          <small>${t.dias} ${t.dias === 1 ? 'dia' : 'dias'} com registro</small></span>
-        <span class="barraCx">
-          <i style="--larg:${(t.media / maior * 100).toFixed(1)}%;background:${corDaNota(t.media)};
-                    animation-delay:${i * 60}ms"></i>
-          <b style="color:${corDaNota(t.media)}">${t.media.toFixed(2)}</b>
-        </span>
-        <span class="num">${t.avaliadas}</span>
-        <span class="num ${t.taxaAusente > .3 ? 'alerta' : ''}">${t.ausentes}</span>
-        <span class="num">${t.soma}</span>
-        <span class="num ${t.baixas ? 'ruim' : ''}">${t.baixas || '—'}</span>
-        <span class="falha">${t.pior ? esc(NOMES_CRIT[t.pior[0]] || t.pior[0]) +
-          ' <i>' + t.pior[1] + '×</i>' : '—'}</span>
-      </div>`).join('')}`;
+  alvo.innerHTML = lista.map((t,i)=>{
+    const falta = t.proximo ? t.proximo.min - t.soma : 0;
+    const prog = t.proximo
+      ? ((t.soma - t.elo.min) / (t.proximo.min - t.elo.min) * 100).toFixed(0)
+      : 100;
+    return `
+    <div class="rk" style="--c:${t.elo.cor};--c2:${t.elo.cor2};--brilho:${t.elo.brilho}"
+         onclick="focarTecnico('${esc(t.nome).replace(/'/g,"\\'")}')">
+      <div class="rkPos">${i + 1}</div>
+      <div class="rkMedalha">${medalhaSvg(t.elo)}</div>
+      <div class="rkMeio">
+        <div class="rkNome">${esc(t.nome)}
+          <span class="rkElo">${t.elo.nome}</span></div>
+        <div class="rkBarra">
+          <i style="--larg:${(t.soma / maior * 100).toFixed(1)}%;animation-delay:${i*70}ms"></i>
+        </div>
+        <div class="rkDetalhe">
+          <span><b>${t.avaliadas}</b> avaliadas</span>
+          <span><b>${t.ausentes}</b> ausentes</span>
+          <span><b>${t.media.toFixed(2)}</b> de média</span>
+          ${t.baixas ? `<span class="ruim"><b>${t.baixas}</b> nota ≤3</span>` : ''}
+          ${t.parcerias ? `<span><b>${t.parcerias}</b> em dupla</span>` : ''}
+          ${t.pior ? `<span class="falta">esquece ${esc(NOMES_CRIT[t.pior[0]] || t.pior[0])}
+            <b>${t.pior[1]}×</b></span>` : ''}
+        </div>
+      </div>
+      <div class="rkPontos">
+        <b>${t.soma}</b><span>pontos</span>
+        ${falta > 0 ? `<i>faltam ${falta} para ${t.proximo.nome}</i>`
+                    : '<i class="topo">elo máximo</i>'}
+      </div>
+    </div>`;
+  }).join('');
 }
 
-/* ---------- critérios mais esquecidos ---------- */
+/* ---------- critérios esquecidos ---------- */
 function desenharFalhas(d){
   const alvo = $('#pnFalhas');
   if(!alvo) return;
   const comNota = d.filter(x => x.nota !== null);
-
   const linhas = Object.keys(NOMES_CRIT).map(k=>{
-    const respondidas = comNota.filter(x => x.criterios[k]);
-    const nao = respondidas.filter(x => String(x.criterios[k]).toUpperCase() === 'NÃO').length;
-    return {k, rotulo: NOMES_CRIT[k], nao, de: respondidas.length};
+    const resp = comNota.filter(x => x.criterios[k]);
+    const nao = resp.filter(x => String(x.criterios[k]).toUpperCase() === 'NÃO').length;
+    return {rotulo: NOMES_CRIT[k], nao, de: resp.length};
   }).filter(x => x.nao).sort((a,b)=> b.nao - a.nao);
 
   if(!linhas.length){
-    alvo.innerHTML = '<p class="pnSub" style="margin:0">Nenhum critério marcado como não cumprido.</p>';
+    alvo.innerHTML = '<p class="pnSub" style="margin:0">Nenhum critério em falta.</p>';
     return;
   }
   const maior = linhas[0].nao;
@@ -1590,7 +1622,7 @@ function desenharFalhas(d){
     </div>`).join('')}</div>`;
 }
 
-/* ---------- lista de notas baixas ---------- */
+/* ---------- notas baixas ---------- */
 function desenharBaixas(comNota){
   const alvo = $('#pnBaixas');
   if(!alvo) return;
@@ -1599,7 +1631,7 @@ function desenharBaixas(comNota){
     alvo.innerHTML = '<p class="pnSub" style="margin:0">Nenhuma ordem com nota 3 ou menos.</p>';
     return;
   }
-  alvo.innerHTML = baixas.slice(0, 40).map(x=>{
+  alvo.innerHTML = baixas.slice(0,40).map(x=>{
     const faltou = Object.entries(x.criterios)
       .filter(([,v]) => String(v).toUpperCase() === 'NÃO')
       .map(([k]) => NOMES_CRIT[k] || k);
@@ -1609,20 +1641,19 @@ function desenharBaixas(comNota){
         <b>${esc(x.cliente || 'sem nome')}</b>
         <small>${esc(x.tecnico)}${x.dia ? ' · ' + brData(x.dia) : ''} · OS ${esc(x.os)}</small>
         ${faltou.length ? `<span class="baixaFalt">faltou: ${esc(faltou.join(', '))}</span>` : ''}
-      </span>
-    </div>`;
+      </span></div>`;
   }).join('') + (baixas.length > 40
-    ? `<p class="pnSub" style="margin:10px 0 0">+ ${baixas.length - 40} ordens</p>` : '');
+    ? `<p class="pnSub" style="margin:10px 0 0">+ ${baixas.length-40} ordens</p>` : '');
 }
 
 /* ---------- exportação ---------- */
 function exportarPainel(){
   const d = tecnicoEmFoco ? dadosPainel.filter(x => x.tecnico === tecnicoEmFoco) : dadosPainel;
   const eq = porTecnico(d);
-  const cab = ['Posicao','Tecnico','Media','Avaliadas','Ausentes','Soma dos pontos',
-               'Notas 3 ou menos','Excelentes','Dias','Criterio que mais esquece'];
-  const linhas = eq.map((t,i)=>[i+1, t.nome, t.media.toFixed(2), t.avaliadas, t.ausentes,
-    t.soma, t.baixas, t.excelentes, t.dias,
+  const cab = ['Posicao','Tecnico','Elo','Soma dos pontos','Media','Avaliadas','Ausentes',
+               'Notas 3 ou menos','Excelentes','Dias','Em dupla','Criterio que mais esquece'];
+  const linhas = eq.map((t,i)=>[i+1, t.nome, t.elo.nome, t.soma, t.media.toFixed(2),
+    t.avaliadas, t.ausentes, t.baixas, t.excelentes, t.diasN, t.parcerias,
     t.pior ? (NOMES_CRIT[t.pior[0]] || t.pior[0]) + ' (' + t.pior[1] + ')' : '']);
   const csv = '\ufeff' + [cab, ...linhas]
     .map(l => l.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(';')).join('\n');
@@ -1633,24 +1664,28 @@ window.exportarPainel = exportarPainel;
 
 
 /* ---------- o céu de pontos ---------- */
-function desenharCeu(d){
-  const L = 900, A = 300, m = {t:18, r:18, b:34, l:38};
+function desenharCeu(todas){
+  const d = todas.filter(x => x.dia);
+  const L = 900, A = 320, m = {t:18, r:18, b:52, l:38};
   const dias = [...new Set(d.map(x => x.dia))].sort();
-  const notas = d.map(x => x.pontos);
+  const notas = d.filter(x => x.nota !== null).map(x => x.nota);
+  if(!dias.length) return;
   const maxN = Math.max(7, ...notas), minN = Math.min(0, ...notas);
 
   const px = dia => dias.length < 2 ? L/2
     : m.l + (dias.indexOf(dia) / (dias.length - 1)) * (L - m.l - m.r);
-  const py = n => A - m.b - ((n - minN) / (maxN - minN || 1)) * (A - m.t - m.b);
+  const py = n => A - m.b - ((n - minN) / (maxN - minN || 1)) * (A - m.t - m.b - 26);
+  const yAusente = A - m.b + 14;   // faixa própria, abaixo do zero
 
   // pontos no mesmo lugar se espalham, para nenhum sumir atrás de outro
   const usados = {};
   const pontos = d.map(x=>{
-    const chave = x.dia + ':' + x.pontos;
+    const chave = x.dia + ':' + (x.nota === null ? 'aus' : x.nota);
     const k = usados[chave] = (usados[chave] || 0) + 1;
     const lado = k % 2 ? 1 : -1;
     const desvio = Math.floor(k / 2) * 7 * lado;
-    return {...x, cx: px(x.dia) + desvio, cy: py(x.pontos)};
+    return {...x, cx: px(x.dia) + desvio,
+            cy: x.nota === null ? yAusente : py(x.nota)};
   });
 
   const linhas = [];
@@ -1672,10 +1707,14 @@ function desenharCeu(d){
       ${linhas.join('')}
       ${marcos.map(dia=>`<text x="${px(dia)}" y="${A-10}" text-anchor="middle"
         class="pnEixo">${dia.slice(8)}/${dia.slice(5,7)}</text>`).join('')}
+      <line x1="${m.l}" y1="${yAusente - 13}" x2="${L-m.r}" y2="${yAusente - 13}"
+            stroke="#EBEBED" stroke-width="1"/>
+      <text x="${m.l-9}" y="${yAusente+4}" text-anchor="end" class="pnEixo">aus</text>
       ${pontos.map((p,i)=>`
-        <circle cx="${p.cx}" cy="${p.cy}" r="0" fill="${corDaNota(p.pontos)}"
-          class="pnPonto" style="animation-delay:${Math.min(i*9, 900)}ms"
-          data-i="${i}" opacity=".85"/>`).join('')}
+        <circle cx="${p.cx}" cy="${p.cy}" r="0"
+          fill="${p.nota === null ? '#C8CCD0' : corDaNota(p.nota)}"
+          class="pnPonto" style="animation-delay:${Math.min(i*8, 900)}ms"
+          data-i="${i}" opacity="${p.nota === null ? '.6' : '.85'}"/>`).join('')}
     </svg>
     <div class="pnDica" id="pnDica" hidden></div>`;
 
@@ -1685,8 +1724,10 @@ function desenharCeu(d){
       const p = pontos[+c.dataset.i];
       dica.innerHTML = `<b>${esc(p.cliente || 'sem nome')}</b>
         <span>${esc(p.tecnico || '')}</span>
-        <span>OS ${esc(p.os)} · ${esc(p.data)}</span>
-        <i style="color:${corDaNota(p.pontos)}">nota ${p.pontos}</i>`;
+        <span>OS ${esc(p.os)}${p.dia ? ' · ' + brData(p.dia) : ''}</span>
+        ${p.nota === null
+          ? '<i style="color:#9BA1A6">cliente ausente</i>'
+          : `<i style="color:${corDaNota(p.nota)}">nota ${p.nota}</i>`}`;
       dica.hidden = false;
       const cx = $('#pnCeu').getBoundingClientRect();
       const r = c.getBoundingClientRect();
@@ -1699,7 +1740,8 @@ function desenharCeu(d){
 }
 
 /* ---------- a rosa dos critérios ---------- */
-function desenharRosa(d){
+function desenharRosa(todas){
+  const d = todas.filter(x => x.nota !== null);
   const T = 320, c = T/2, raioMax = 118;
   const n = CRITERIOS.length;
 
@@ -1755,12 +1797,13 @@ function desenharRosa(d){
 }
 
 /* ---------- a onda dos dias ---------- */
-function desenharOnda(d){
+function desenharOnda(todas){
+  const d = todas.filter(x => x.dia && x.nota !== null);
   const L = 900, A = 170, m = {t:14, r:16, b:28, l:34};
   const porDia = {};
   d.forEach(x=>{
     const o = porDia[x.dia] = porDia[x.dia] || {soma:0, n:0};
-    o.soma += x.pontos; o.n++;
+    o.soma += x.nota; o.n++;
   });
   const dias = Object.keys(porDia).sort();
   if(dias.length < 2){
