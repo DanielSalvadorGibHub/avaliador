@@ -475,6 +475,99 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
   .rkPontos b{font-size:22px} .rkPontos i{margin:0 0 0 auto}
   .heroiNum b{font-size:52px}
 }
+
+/* ===========================================================
+   Painel no escuro
+
+   Só esta aba. Gráfico com muita informação cansa menos sobre
+   fundo escuro, e as cores das notas ficam mais legíveis.
+   =========================================================== */
+#t-painel{
+  --fundo-pn:#0B0F0D; --carta:#131916; --carta2:#1A211D;
+  --borda-pn:#222B26; --grade:#242E28;
+  --txt-pn:#E8EDEA; --txt2-pn:#9BAAA2; --txt3-pn:#6B7B73;
+  background:var(--fundo-pn);color:var(--txt-pn)
+}
+#t-painel .topo{background:#0E1411;border-bottom:1px solid var(--borda-pn)}
+#t-painel .topo h1{color:var(--txt-pn)}
+#t-painel .olho{color:#4ADE80}
+#t-painel h2{color:var(--txt-pn)}
+#t-painel .pnSub{color:var(--txt3-pn)}
+#t-painel .carregando{color:var(--txt2-pn)}
+#t-painel .carregando i{border-color:var(--borda-pn);border-top-color:#4ADE80}
+
+/* avisos */
+#t-painel .aviso{background:rgba(74,222,128,.09);color:var(--txt-pn)}
+#t-painel .aviso.amb{background:rgba(232,182,92,.1);color:#F0CE8A}
+#t-painel .aviso.err{background:rgba(232,115,127,.1);color:#F2A7AD}
+
+/* filtros */
+#t-painel .pnChip{background:var(--carta);border-color:var(--borda-pn);color:var(--txt2-pn)}
+#t-painel .pnChip:hover{border-color:#3A463F;color:var(--txt-pn)}
+#t-painel .pnChip.on{background:#4ADE80;border-color:#4ADE80;color:#06140C}
+
+/* número principal */
+#t-painel .heroi{background:linear-gradient(135deg,#0E1411,#1A2320);
+  border:1px solid var(--borda-pn)}
+#t-painel .heroiNum span{color:var(--txt3-pn)}
+#t-painel .heroiLinha em{color:var(--txt-pn)}
+#t-painel .heroiLinha span{color:var(--txt3-pn)}
+
+/* elos */
+#t-painel .eloCard{background:var(--carta);border:1px solid var(--borda-pn)}
+#t-painel .eloNome{color:var(--txt-pn)}
+#t-painel .eloFaixa{color:var(--txt3-pn)}
+#t-painel .eloGente span{background:rgba(255,255,255,.05);color:var(--txt2-pn)}
+#t-painel .eloGente span:hover{background:rgba(255,255,255,.1);color:var(--txt-pn)}
+#t-painel .eloGente b{color:var(--txt-pn)}
+#t-painel .eloGente i{color:var(--txt3-pn)}
+
+/* ranking */
+#t-painel .rk{background:var(--carta);border-color:var(--borda-pn)}
+#t-painel .rk:hover{border-color:#3A463F;background:var(--carta2);
+  box-shadow:0 6px 24px rgba(0,0,0,.4)}
+#t-painel .rkPos{color:var(--txt3-pn)}
+#t-painel .rkNome{color:var(--txt-pn)}
+#t-painel .rkBarra{background:#222B26}
+#t-painel .rkDetalhe{color:var(--txt3-pn)}
+#t-painel .rkDetalhe b{color:var(--txt2-pn)}
+#t-painel .rkPontos b{color:var(--txt-pn)}
+#t-painel .rkPontos span,#t-painel .rkPontos i{color:var(--txt3-pn)}
+
+/* caixas dos gráficos */
+#t-painel .pnCaixa,#t-painel .pnRosaCx{background:var(--carta);border-color:var(--borda-pn)}
+#t-painel .pnEixo{fill:var(--txt3-pn)}
+#t-painel .pnRot{fill:var(--txt2-pn)}
+#t-painel .pnRotN{fill:var(--txt3-pn)}
+/* o CSS sobrepõe os atributos de apresentação do SVG */
+#t-painel svg line,#t-painel svg polygon[stroke]{stroke:var(--grade)}
+#t-painel .rosaForma{stroke:#4ADE80;fill:rgba(74,222,128,.16)}
+#t-painel .ondaLinha{stroke:#4ADE80}
+#t-painel .ondaPonto{fill:var(--carta);stroke:#4ADE80}
+#t-painel .pnDica{background:#05100A;border:1px solid #2C3A33;color:var(--txt-pn)}
+#t-painel .pnDica span{color:var(--txt3-pn)}
+
+/* critérios esquecidos */
+#t-painel .falhaNm{color:var(--txt2-pn)}
+#t-painel .falhaBr{background:#222B26}
+#t-painel .falhaBr i{background:#F2787F}
+#t-painel .falhaLn b{color:#F2787F}
+
+/* notas baixas */
+#t-painel .baixaLn{border-bottom-color:var(--borda-pn)}
+#t-painel .baixaInfo b{color:var(--txt-pn)}
+#t-painel .baixaInfo small{color:var(--txt3-pn)}
+#t-painel .baixaFalt{color:#F2787F}
+
+/* botões e dados crus */
+#t-painel .bt.neutro{background:var(--carta);color:var(--txt2-pn);
+  border:1px solid var(--borda-pn)}
+#t-painel .bt.neutro:hover{background:var(--carta2);color:var(--txt-pn)}
+#t-painel .cru{background:#05100A;color:var(--txt2-pn);border:1px solid var(--borda-pn)}
+#t-painel ::-webkit-scrollbar-thumb{background:#2C3A33}
+
+#t-painel .linhaCinco{stroke:#4ADE80}
+#t-painel .pnPonto{stroke:rgba(0,0,0,.35);stroke-width:.6}
 </style>
 </head>
 <body>
@@ -539,7 +632,7 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
     <footer class="capaPe">
       <span class="capaQuem"><i>DS</i>
         <div><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></div></span>
-      <span class="capaVer">versão 8 · documento interno</span>
+      <span class="capaVer">versão 9 · documento interno</span>
     </footer>
   </div>
 </div>
@@ -1290,9 +1383,11 @@ function alternarIndice(){
 let dadosPainel = [];
 let tecnicoEmFoco = null;
 
+/* Tons escolhidos para o fundo escuro do painel: o verde fechado
+   sumia e o vermelho escuro virava borrão. */
 const FAIXAS = [
-  {min: 6, cor:'#1E8A2E'}, {min: 5, cor:'#34C759'},
-  {min: 4, cor:'#9A6700'}, {min: 0, cor:'#C7362F'},
+  {min: 6, cor:'#4ADE80'}, {min: 5, cor:'#34D399'},
+  {min: 4, cor:'#F0CE8A'}, {min: 0, cor:'#F2787F'},
 ];
 const corDaNota = n => (FAIXAS.find(f => n >= f.min) || FAIXAS[3]).cor;
 
@@ -1703,7 +1798,7 @@ function desenharCeu(todas){
   $('#pnCeu').innerHTML = `
     <svg viewBox="0 0 ${L} ${A}" class="pnSvg">
       <line x1="${m.l}" y1="${py(5)}" x2="${L-m.r}" y2="${py(5)}"
-            stroke="#3ECF5A" stroke-width="1.5" stroke-dasharray="5 4" opacity=".55"/>
+            class="linhaCinco" stroke-width="1.5" stroke-dasharray="5 4" opacity=".6"/>
       ${linhas.join('')}
       ${marcos.map(dia=>`<text x="${px(dia)}" y="${A-10}" text-anchor="middle"
         class="pnEixo">${dia.slice(8)}/${dia.slice(5,7)}</text>`).join('')}
