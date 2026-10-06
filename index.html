@@ -371,6 +371,24 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
   overflow:auto;margin-bottom:10px}
 /* a etiqueta do técnico é quem responde pela ordem */
 .etq#fTecnico{background:var(--verde-f);color:var(--verde-e);font-weight:600}
+
+/* ranking por técnico */
+.rank{display:grid;grid-template-columns:26px 1fr 150px 46px;gap:12px;align-items:center;
+  padding:9px 2px;border-bottom:1px solid var(--cinza2)}
+.rank:last-child{border-bottom:0}
+.rankPos{font:500 12px var(--mono);color:var(--tinta3);text-align:center}
+.rankNome{min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.rankNome{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rankNome small{font-size:11.5px;color:var(--tinta3);font-weight:400}
+.rankBarra{height:7px;background:var(--cinza2);border-radius:4px;overflow:hidden}
+.rankBarra i{display:block;height:100%;border-radius:4px;width:0;
+  animation:crescer .9s cubic-bezier(.32,.72,0,1) forwards}
+@keyframes crescer{to{width:var(--larg)}}
+.rankNota{font-size:16px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:700px){
+  .rank{grid-template-columns:24px 1fr 46px}
+  .rankBarra{display:none}
+}
 </style>
 </head>
 <body>
@@ -1195,12 +1213,29 @@ const FAIXAS = [
 ];
 const corDaNota = n => (FAIXAS.find(f => n >= f.min) || FAIXAS[3]).cor;
 
+/* A data chega de muitos jeitos: texto ISO, texto brasileiro, Date
+   serializado pelo JSON, ou número de série — que é como o Google
+   Sheets guarda datas por baixo. Aceita todos. */
 function diaIso(t){
-  const s = String(t || '');
-  let m = s.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-  if(m) return m[3] + '-' + m[2] + '-' + m[1];
-  m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
-  return m ? m[0] : '';
+  if(t === null || t === undefined || t === '') return '';
+
+  // número de série: dias desde 30/12/1899
+  const n = typeof t === 'number' ? t : (/^\d{4,6}(\.\d+)?$/.test(String(t).trim())
+    ? Number(t) : null);
+  if(n !== null && n > 20000 && n < 80000){
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(n) * 86400000);
+    return d.toISOString().slice(0, 10);
+  }
+
+  const s = String(t).trim();
+  let m = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);   // 02/10/2026
+  if(m) return m[3] + '-' + m[2].padStart(2,'0') + '-' + m[1].padStart(2,'0');
+  m = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);                  // 2026-10-02
+  if(m) return m[1] + '-' + m[2].padStart(2,'0') + '-' + m[3].padStart(2,'0');
+
+  // última tentativa: deixar o próprio navegador interpretar
+  const d = new Date(s);
+  return isNaN(d) ? '' : d.toISOString().slice(0, 10);
 }
 
 async function abrirPainel(){
@@ -1220,17 +1255,18 @@ async function abrirPainel(){
       x.pontos === null || x.pontos === '' || x.pontos === undefined).length;
     const comNota = brutas.filter(x =>
       x.pontos !== null && x.pontos !== '' && x.pontos !== undefined);
-    const semData = comNota.filter(x => !diaIso(x.data)).length;
-
+    // sem data a ordem ainda vale para a média e o ranking; só não
+    // entra nos gráficos que dependem do tempo
     dadosPainel = comNota
       .map(x => Object.assign({}, x, {pontos: Number(x.pontos), dia: diaIso(x.data)}))
-      .filter(x => x.dia && !isNaN(x.pontos));
+      .filter(x => !isNaN(x.pontos));
+    const semData = dadosPainel.filter(x => !x.dia).length;
 
     if(!dadosPainel.length){
       alvo.innerHTML = diagnosticoPainel(brutas, semNota, semData, r);
       return;
     }
-    desenharPainel();
+    desenharPainel(semData);
   }catch(e){
     alvo.innerHTML = '<p class="aviso err"><b>Não consegui ler a planilha</b>' +
       esc(e.message) + '<br><br>Confira em Ajustes se a URL termina em <b>/exec</b> ' +
@@ -1295,13 +1331,14 @@ async function verRespostaCrua(){
 window.verRespostaCrua = verRespostaCrua;
 window.abrirPainel = abrirPainel;
 
-function desenharPainel(){
+function desenharPainel(semData){
   const d = tecnicoEmFoco
     ? dadosPainel.filter(x => x.tecnico === tecnicoEmFoco)
     : dadosPainel;
+  const comDia = d.filter(x => x.dia);
 
   const media = d.reduce((s,x)=>s+x.pontos, 0) / d.length;
-  const dias = [...new Set(dadosPainel.map(x => x.dia))].sort();
+  const dias = [...new Set(dadosPainel.map(x => x.dia).filter(Boolean))].sort();
   const tecnicos = [...new Set(dadosPainel.map(x => x.tecnico).filter(Boolean))].sort();
 
   $('#painelCorpo').innerHTML = `
@@ -1334,25 +1371,71 @@ function desenharPainel(){
         data-tec="${esc(t)}">${esc(t.split(' ')[0])}</button>`).join('')}
     </div>
 
+    ${semData ? `<p class="aviso amb" style="margin-bottom:14px">
+      <b>${semData} ordens sem data reconhecida</b>
+      Elas entram na média e no ranking, mas ficam fora dos gráficos de tempo.
+      Confira o formato da coluna DATA na planilha.</p>` : ''}
+
+    <h2>Nota por técnico</h2>
+    <p class="pnSub">ordenado da maior para a menor média</p>
+    <div class="pnCaixa" id="pnRank"></div>
+
+    ${comDia.length ? `
     <h2>Cada ponto é uma ordem</h2>
     <p class="pnSub">tempo na horizontal, nota na vertical · passe o mouse</p>
-    <div class="pnCaixa" id="pnCeu"></div>
+    <div class="pnCaixa" id="pnCeu"></div>` : ''}
 
     <h2>O que costuma faltar</h2>
     <p class="pnSub">quanto mais cheio o raio, mais aquele critério é cumprido</p>
     <div class="pnRosaCx" id="pnRosa"></div>
 
+    ${comDia.length > 1 ? `
     <h2>Evolução por dia</h2>
-    <div class="pnCaixa" id="pnOnda"></div>`;
+    <div class="pnCaixa" id="pnOnda"></div>` : ''}`;
 
   $$('#painelCorpo [data-tec]').forEach(b => b.onclick = ()=>{
     tecnicoEmFoco = b.dataset.tec || null;
     desenharPainel();
   });
 
-  desenharCeu(d);
+  desenharRanking(d);
+  if(comDia.length) desenharCeu(comDia);
   desenharRosa(d);
-  desenharOnda(d);
+  if(comDia.length > 1) desenharOnda(comDia);
+}
+
+/* Ranking por técnico: funciona mesmo sem data, por isso vem antes
+   dos gráficos que dependem do tempo. */
+function desenharRanking(d){
+  const alvo = $('#pnRank');
+  if(!alvo) return;
+
+  const por = {};
+  d.forEach(x=>{
+    const t = x.tecnico || 'sem técnico';
+    const o = por[t] = por[t] || {soma:0, n:0, baixas:0};
+    o.soma += x.pontos; o.n++;
+    if(x.pontos <= 3) o.baixas++;
+  });
+
+  const lista = Object.entries(por)
+    .map(([nome,o]) => ({nome, media:o.soma/o.n, n:o.n, baixas:o.baixas}))
+    .sort((a,b)=> b.media - a.media);
+
+  const maior = Math.max(7, ...lista.map(t => t.media));
+
+  alvo.innerHTML = lista.map((t,i)=>`
+    <div class="rank">
+      <span class="rankPos">${i + 1}</span>
+      <span class="rankNome">${esc(t.nome)}
+        <small>${t.n} ${t.n === 1 ? 'ordem' : 'ordens'}${
+          t.baixas ? ' · ' + t.baixas + ' com nota 3 ou menos' : ''}</small></span>
+      <span class="rankBarra">
+        <i style="--larg:${(t.media / maior * 100).toFixed(1)}%;
+                  background:${corDaNota(t.media)};animation-delay:${i * 70}ms"></i>
+      </span>
+      <b class="rankNota" style="color:${corDaNota(t.media)}">${t.media.toFixed(1)}</b>
+    </div>`).join('');
 }
 
 /* ---------- o céu de pontos ---------- */
