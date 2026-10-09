@@ -632,7 +632,7 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
     <footer class="capaPe">
       <span class="capaQuem"><i>DS</i>
         <div><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></div></span>
-      <span class="capaVer">versão 9 · documento interno</span>
+      <span class="capaVer">versão 10 · documento interno</span>
     </footer>
   </div>
 </div>
@@ -1091,6 +1091,7 @@ function mostrarOrdem(){
   desenharCriterios();
   mostrarFoto();
   buscarFotos(o);
+  adiantarFotos();
 }
 
 function etiqueta(sel, txt){
@@ -1220,17 +1221,72 @@ $('#fotoProx').onclick = ()=>{
   mostrarFoto();
 };
 
-async function buscarFotos(o){
-  if(!ponteViva || o.buscou) return;
+/* ---------- fotos: busca a atual e adianta as próximas ----------
+   Enquanto você avalia uma ordem, as seguintes já vão sendo
+   buscadas no HubSoft e as imagens entram no cache do navegador.
+   Assim, ao clicar em Concluir, a próxima já aparece pronta. */
+const ADIANTAR = 3;      // quantas ordens à frente ficam prontas
+let emVoo = 0;           // buscas em andamento
+
+function proximasPendentes(o, n){
+  const i = fila.indexOf(o);
+  const fora = [];
+  for(let k = i + 1; k < fila.length && fora.length < n; k++){
+    const p = fila[k];
+    if(p && !p.buscou && !jaAvaliadas.has(String(p.os))) fora.push(p);
+  }
+  return fora;
+}
+
+/* baixa as imagens de verdade, não só os endereços */
+function aquecerImagens(o){
+  (o.fotos || []).forEach(f=>{
+    if(!f.url || f.aquecida) return;
+    f.aquecida = true;
+    const im = new Image();
+    im.decoding = 'async';
+    im.src = f.url;
+  });
+}
+
+async function buscarFotos(o, tentativa){
+  if(!ponteViva || !o || o.buscou || o.buscando) return;
+  o.buscando = true; emVoo++;
+  const soltar = ()=>{ if(o.buscando){ o.buscando = false; emVoo--; } };
   try{
-    const r = await fetch(cfg.ponte + '/fotos?os=' + encodeURIComponent(o.os),
-                          {signal: AbortSignal.timeout(40000)});
+    const adiante = proximasPendentes(o, ADIANTAR).map(p=>p.os).join(',');
+    const r = await fetch(cfg.ponte + '/fotos?os=' + encodeURIComponent(o.os)
+      + (adiante ? '&proximas=' + encodeURIComponent(adiante) : ''),
+      {signal: AbortSignal.timeout(50000)});
     const j = await r.json();
-    if(j.aguarde) return;
+    if(j.aguarde){
+      soltar();
+      if((tentativa || 0) < 3){
+        setTimeout(()=> buscarFotos(o, (tentativa || 0) + 1), 1500);
+        return;
+      }
+      o.buscou = true;
+      if(ordemAtual() === o) mostrarFoto();
+      return;
+    }
     o.fotos = (j.fotos || []).map(f => typeof f === 'string' ? {url:f} : f);
     o.buscou = true;
+    aquecerImagens(o);
     if(ordemAtual() === o) mostrarFoto();
-  }catch(e){ o.buscou = true; }
+  }catch(e){
+    o.buscou = true;
+    if(ordemAtual() === o) mostrarFoto();
+  }finally{ soltar(); }
+}
+
+function adiantarFotos(){
+  if(!ponteViva) return;
+  const o = ordemAtual();
+  if(!o) return;
+  proximasPendentes(o, ADIANTAR).forEach(p=>{
+    if(emVoo > ADIANTAR) return;
+    buscarFotos(p);
+  });
 }
 
 /* ---------- concluir ---------- */
@@ -1955,9 +2011,16 @@ async function checarPonte(){
   try{
     const r = await fetch(cfg.ponte + '/status', {signal: AbortSignal.timeout(2500)});
     const j = await r.json();
+    const acordou = !ponteViva && !!j.pronto;
     ponteViva = !!j.pronto;
     mostrarPonte(j.pronto, j.pronto ? 'Ponte conectada ao HubSoft'
       : (j.erro || 'Ponte iniciando…'));
+    // ponte acabou de subir: já busca a ordem na tela e adianta as próximas
+    if(acordou && fila.length){
+      const o = ordemAtual();
+      if(o && !o.buscou) buscarFotos(o);
+      adiantarFotos();
+    }
   }catch(e){
     ponteViva = false;
     mostrarPonte(false, 'Ponte desligada — avaliando pelas descrições');
