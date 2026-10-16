@@ -163,9 +163,12 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
   color:var(--tinta2);font-size:13px;cursor:pointer;flex:0 0 auto}
 .avCab .mini:hover{background:var(--cinza2);color:var(--tinta)}
 
+/* a linha precisa ser minmax(0,1fr): com 'auto' ela cresce junto com a
+   foto e a imagem passa do rodapé da tela, parecendo cortada */
 .avGrade{flex:1;min-height:0;display:grid;
   grid-template-columns:minmax(320px,1fr) minmax(0,1.3fr) 272px;
-  gap:18px;padding:16px 24px 18px}
+  grid-template-rows:minmax(0,1fr);
+  gap:18px;padding:16px 24px 18px;overflow:hidden}
 
 /* -- coluna 1: a ficha -- */
 .ficha{display:flex;flex-direction:column;gap:11px;min-height:0}
@@ -216,12 +219,48 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
 .fotoBarra .qual{font:500 12.5px var(--mono);color:var(--tinta2)}
 .fotoBarra .rotulo{margin-left:auto;font-size:12.5px;color:var(--tinta3);overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
-.foto{flex:1;min-height:0;border-radius:16px;overflow:hidden;background:#0C0C0D;
+.foto{position:relative;flex:1;min-height:0;border-radius:16px;overflow:hidden;background:#0C0C0D;
   display:grid;place-items:center;box-shadow:var(--sombra)}
-.foto img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;
+/* a foto é posicionada sobre a caixa inteira: assim o 'contain' usa a
+   altura real da caixa e a imagem nunca passa do rodapé nem é cortada */
+.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
   cursor:zoom-in;display:block}
 .foto img.zoom{transform:scale(2.2);transition:transform .25s;cursor:zoom-out}
-.foto .nada{color:#6E6E73;font-size:14px;text-align:center;padding:24px}
+.foto .nada{color:#6E6E73;font-size:14px;text-align:center;padding:24px;display:flex;
+  flex-direction:column;align-items:center;gap:12px;position:relative;z-index:2}
+.foto .nada button{background:var(--verde);border:0;border-radius:11px;color:#fff;
+  padding:9px 16px;font:600 13px var(--ui);cursor:pointer}
+.foto .nada button:hover{background:var(--verde-e)}
+.foto .nada button:disabled{background:#3A3A3C;cursor:default}
+
+/* -- aviso de ordem já avaliada -- */
+.avDup{display:flex;align-items:center;gap:14px;margin:0 24px;padding:11px 16px;
+  background:var(--ambar-f);border:1px solid #F0D27A;border-radius:14px;flex:0 0 auto}
+.avDup[hidden]{display:none}
+.dupTxt{flex:1;min-width:0;display:flex;flex-direction:column}
+.dupTxt b{font-size:13.5px;color:var(--ambar)}
+.dupTxt span{font-size:12.5px;color:var(--tinta2);line-height:1.45}
+.avDup .bt{flex:0 0 auto;padding:8px 14px;font-size:13px}
+
+/* -- foto em tela cheia -- */
+.lupa{position:fixed;inset:0;z-index:400;background:rgba(8,8,10,.96);display:flex;
+  flex-direction:column;animation:surge .16s ease}
+.lupa[hidden]{display:none}
+.lupaBarra{display:flex;align-items:center;gap:16px;padding:12px 18px;color:#D8D8DA;
+  font-size:12.5px;flex:0 0 auto}
+.lupaBarra #lupaQual{font:500 13px var(--mono)}
+.lupaBarra #lupaDica{color:#8A8A8E}
+.lupaBarra button{margin-left:auto;background:rgba(255,255,255,.1);border:0;border-radius:9px;
+  width:34px;height:30px;color:#fff;font-size:14px;cursor:pointer}
+.lupaBarra button:hover{background:rgba(255,255,255,.2)}
+.lupaPalco{flex:1;min-height:0;position:relative;overflow:hidden;margin:0 54px 20px}
+.lupaPalco img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  cursor:zoom-in;transition:transform .18s ease-out}
+.lupaPalco img.perto{transform:scale(3);cursor:zoom-out;transition:transform .18s ease-out}
+.lupaSeta{position:absolute;top:50%;transform:translateY(-50%);z-index:2;background:rgba(255,255,255,.1);
+  border:0;border-radius:50%;width:42px;height:42px;color:#fff;font-size:22px;cursor:pointer}
+.lupaSeta:hover{background:rgba(255,255,255,.22)}
+.lupaSeta.esq{left:8px} .lupaSeta.dir{right:8px}
 
 /* -- coluna 3: os critérios -- */
 .marcas{display:flex;flex-direction:column;gap:9px;min-height:0}
@@ -263,7 +302,8 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
 .avPar .bt{flex:1;padding:10px;font-size:13.5px}
 
 @media(max-width:1200px){
-  .avGrade{grid-template-columns:minmax(290px,1fr) minmax(0,1fr);grid-template-rows:1fr auto}
+  .avGrade{grid-template-columns:minmax(290px,1fr) minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) auto}
   .marcas{grid-column:1 / -1;max-height:230px}
   .listaCrit{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
     align-content:start}
@@ -349,6 +389,16 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
 @keyframes tracar{to{stroke-dashoffset:0}}
 .ondaArea{opacity:0;animation:surge .7s ease .9s forwards}
 .ondaPonto{opacity:0;animation:surge .3s ease forwards}
+/* barras do dia: crescem da base, como uma coluna sendo preenchida */
+.barraDia,.barraAus{transform:scaleY(0);transform-origin:bottom;transform-box:fill-box;
+  animation:crescerBarra .62s cubic-bezier(.32,.72,0,1) forwards;cursor:default}
+@keyframes crescerBarra{to{transform:scaleY(1)}}
+.barraDia:hover,.barraAus:hover{filter:brightness(1.15)}
+.barraVal{font:600 11.5px var(--mono);fill:#1D1D1F;opacity:0;animation:surge .4s ease forwards}
+.barraLeg{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:flex-end;
+  margin-top:10px;font-size:11.5px;color:#86868B}
+.barraLeg span{display:inline-flex;align-items:center;gap:6px}
+.barraLeg i{width:10px;height:10px;border-radius:3px;display:inline-block}
 
 /* ============ aviso flutuante ============ */
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--tinta);
@@ -467,7 +517,7 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
   font-variant-numeric:tabular-nums;color:var(--tinta)}
 .rkPontos span{font-size:11px;color:var(--tinta3);display:block;margin-top:1px}
 .rkPontos i{display:block;font-style:normal;font-size:11px;color:var(--tinta3);margin-top:5px}
-.rkPontos i.topo{color:var(--c2);font-weight:600}
+.rkPontos i.rkTopo{color:var(--c2);font-weight:600}
 
 @media(max-width:820px){
   .rk{grid-template-columns:28px 36px minmax(0,1fr);row-gap:8px}
@@ -533,6 +583,7 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
 #t-painel .rkDetalhe b{color:var(--txt2-pn)}
 #t-painel .rkPontos b{color:var(--txt-pn)}
 #t-painel .rkPontos span,#t-painel .rkPontos i{color:var(--txt3-pn)}
+#t-painel .rkPontos i.rkTopo{color:var(--c);background:none}
 
 /* caixas dos gráficos */
 #t-painel .pnCaixa,#t-painel .pnRosaCx{background:var(--carta);border-color:var(--borda-pn)}
@@ -544,6 +595,8 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
 #t-painel .rosaForma{stroke:#4ADE80;fill:rgba(74,222,128,.16)}
 #t-painel .ondaLinha{stroke:#4ADE80}
 #t-painel .ondaPonto{fill:var(--carta);stroke:#4ADE80}
+#t-painel .barraVal{fill:var(--txt2-pn)}
+#t-painel .barraLeg{color:var(--txt3-pn)}
 #t-painel .pnDica{background:#05100A;border:1px solid #2C3A33;color:var(--txt-pn)}
 #t-painel .pnDica span{color:var(--txt3-pn)}
 
@@ -632,7 +685,7 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
     <footer class="capaPe">
       <span class="capaQuem"><i>DS</i>
         <div><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></div></span>
-      <span class="capaVer">versão 10 · documento interno</span>
+      <span class="capaVer">versão 12 · documento interno</span>
     </footer>
   </div>
 </div>
@@ -681,6 +734,7 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
     <button class="mini" id="btSair" title="Voltar à lista">✕</button>
   </div>
   <div class="indice" id="indice" hidden></div>
+  <div class="avDup" id="avDup" hidden></div>
 
   <div class="avGrade">
 
@@ -716,6 +770,8 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
         <button id="fotoAnt" title="seta esquerda">‹</button>
         <button id="fotoProx" title="seta direita">›</button>
         <span class="qual" id="fotoQual">—</span>
+        <button id="btRebuscar" title="buscar as fotos desta OS no HubSoft">⟳</button>
+        <button id="btLupa" title="ver em tela cheia">⛶</button>
         <span class="rotulo" id="fotoRotulo"></span>
       </div>
       <div class="foto" id="foto"><span class="nada">sem foto</span></div>
@@ -793,6 +849,17 @@ h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:26px 0 10px}
   </div>
 </div>
 
+<div class="lupa" id="lupa" hidden>
+  <div class="lupaBarra">
+    <span id="lupaQual">—</span>
+    <span id="lupaDica">clique na imagem para aproximar · mova o mouse para percorrer</span>
+    <button id="lupaFechar" aria-label="Fechar">✕</button>
+  </div>
+  <button class="lupaSeta esq" id="lupaAnt" aria-label="anterior">‹</button>
+  <div class="lupaPalco" id="lupaPalco"></div>
+  <button class="lupaSeta dir" id="lupaProx" aria-label="próxima">›</button>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -839,6 +906,8 @@ let fila = [], idx = 0, fotoIdx = 0;
 let marcas = {};                 // marcações da ordem atual
 let avaliacoes = [];             // o que foi concluído nesta sessão
 let jaAvaliadas = new Set();     // OS que já constam na planilha
+let fichaPlanilha = new Map();   // OS -> linha já gravada, para avisar com detalhe
+let liberadas = new Set();       // OS que a pessoa escolheu reavaliar mesmo assim
 let ponteViva = false;
 
 const K = 'avaliador:cfg';
@@ -951,9 +1020,14 @@ async function lerArquivo(file){
   const pega = (linha, k) => col[k] >= 0 ? String(linha[col[k]] ?? '').trim() : '';
   const FECHADA = /execut|conclu|final|fechad|cancel|realizad/i;
 
+  const vistas = new Set();
+  let repetidas = 0;
   fila = aoa.slice(1).map(l=>{
     const os = pega(l, 'os');
     if(!os || os === '-') return null;
+    // a mesma OS duas vezes no relatório viraria avaliação em dobro
+    if(vistas.has(os)){ repetidas++; return null; }
+    vistas.add(os);
     return {
       os, cliente: pega(l,'cliente'), tipo: pega(l,'tipo'), tecnico: pega(l,'tecnico'),
       data: soData(pega(l,'data')), status: pega(l,'status'),
@@ -971,13 +1045,16 @@ async function lerArquivo(file){
     <div class="aviso" style="margin-top:16px">
       <b>${total} ordens lidas</b>
       ${fechadas} com situação de encerrada${col.fechamento < 0
-        ? '<br><b style="color:var(--amber)">A coluna de encerramento não foi reconhecida</b>' : ''}
+        ? '<br><b style="color:var(--ambar)">A coluna de encerramento não foi reconhecida</b>' : ''}
+      ${repetidas ? `<br>${repetidas} linha(s) com OS repetida foram descartadas` : ''}
     </div>
     <button class="btnFull" style="margin-top:14px" data-go="lista">Ver o que falta avaliar</button>`;
 
   guardar();
   await conferirPlanilha();
-  aviso(total + ' ordens carregadas.');
+  const jaFeitas = fila.filter(o => jaAvaliadas.has(String(o.os))).length;
+  aviso(total + ' ordens carregadas' +
+    (jaFeitas ? ' · ' + jaFeitas + ' já estão na planilha' : '') + '.');
 }
 
 const soData = t => (String(t||'').match(/(\d{2}\/\d{2}\/\d{4})/) || [,''])[1] ||
@@ -1028,10 +1105,16 @@ function desenharLista(){
     const naPlanilha = jaAvaliadas.has(String(o.os));
     const nota = feita ? (feita.nota === null ? '—' : feita.nota) : (naPlanilha ? '✓' : '');
     const baixa = feita && feita.nota !== null && feita.nota <= 3;
+    const f = naPlanilha ? fichaPlanilha.get(String(o.os)) : null;
+    const quando = f ? diaIso(f.avaliadoEm) || diaIso(f.data) : '';
+    const selo = feita ? ' · avaliada agora'
+      : naPlanilha ? ' · já na planilha' +
+          (quando ? ' (' + quando.split('-').reverse().join('/') + ')' : '')
+      : '';
     return `<button class="item ${feita || naPlanilha ? 'feito' : ''} ${baixa ? 'baixa' : ''}" data-ordem="${i}">
       <span class="bolha">${nota || (i+1)}</span>
       <span class="txt"><b>${esc(o.cliente || 'sem nome')}</b>
-        <small>OS ${esc(o.os)}${o.tipo ? ' · ' + esc(o.tipo) : ''}${o.data ? ' · ' + esc(o.data) : ''}</small></span>
+        <small>OS ${esc(o.os)}${o.tipo ? ' · ' + esc(o.tipo) : ''}${o.data ? ' · ' + esc(o.data) : ''}${selo}</small></span>
       <span class="seta">›</span>
     </button>`;
   }).join('');
@@ -1090,6 +1173,8 @@ function mostrarOrdem(){
 
   desenharCriterios();
   mostrarFoto();
+  conferirDuplicada();
+  if(!$('#lupa').hidden) fecharLupa();
   buscarFotos(o);
   adiantarFotos();
 }
@@ -1195,31 +1280,105 @@ function alternar(id){
 function mostrarFoto(){
   const o = ordemAtual();
   const cx = $('#foto');
-  if(!o.fotos.length){
-    cx.innerHTML = `<div class="vazio">${o.buscou ? 'sem fotos nesta ordem'
-      : (ponteViva ? 'buscando no HubSoft…' : 'ponte desligada — avaliando pelas descrições')}</div>`;
-      $('#fotoQual').textContent = '—';
+  if(!o) return;
+  const temFoto = !!o.fotos.length;
+  $('#btLupa').disabled = !temFoto;
+  $('#fotoAnt').disabled = o.fotos.length < 2;
+  $('#fotoProx').disabled = o.fotos.length < 2;
+  $('#btRebuscar').disabled = !!o.buscando;
+
+  if(!temFoto){
+    const buscando = o.buscando || (!o.buscou && ponteViva);
+    const txt = buscando ? 'buscando no HubSoft…'
+      : o.buscou ? 'nenhuma foto veio desta ordem'
+      : 'ponte desligada — avaliando pelas descrições';
+    cx.innerHTML = `<div class="nada"><span>${txt}</span>
+      ${buscando ? '' : `<button id="btBuscarFoto">${ponteViva
+        ? 'Buscar as fotos no HubSoft' : 'Tentar buscar mesmo assim'}</button>`}</div>`;
+    const bt = $('#btBuscarFoto');
+    if(bt) bt.onclick = rebuscarFotos;
+    $('#fotoQual').textContent = '—';
     return;
   }
+
   const f = o.fotos[fotoIdx] || o.fotos[0];
-  cx.innerHTML = `<img src="${esc(f.url)}" alt="" loading="lazy"
-    onerror="this.parentElement.innerHTML='<div class=\\'vazio\\'>não consegui carregar esta foto</div>'">`;
-  // clicar amplia: etiquetas de MAC costumam exigir
+  cx.innerHTML = `<img src="${esc(f.url)}" alt="">`;
   const img = cx.querySelector('img');
-  if(img) img.onclick = ()=> img.classList.toggle('zoom');
+  img.onerror = ()=>{
+    cx.innerHTML = `<div class="nada"><span>não consegui carregar esta foto</span>
+      <button id="btBuscarFoto">Buscar de novo no HubSoft</button></div>`;
+    const bt = $('#btBuscarFoto');
+    if(bt) bt.onclick = rebuscarFotos;
+  };
+  // clicar abre em tela cheia: etiqueta de MAC exige aproximar
+  img.onclick = abrirLupa;
   $('#fotoQual').textContent = (fotoIdx + 1) + ' / ' + o.fotos.length;
 }
 
-$('#fotoAnt').onclick = ()=>{
+/* Às vezes a galeria do HubSoft não abre a tempo e a ordem fica sem
+   foto. Em vez de perder a avaliação, dá para pedir de novo. */
+function rebuscarFotos(){
   const o = ordemAtual();
-  fotoIdx = (fotoIdx - 1 + o.fotos.length) % o.fotos.length;
+  if(!o) return;
+  if(!cfg.ponte){
+    aviso('Configure o endereço da ponte em Ajustes para buscar as fotos.');
+    return;
+  }
+  o.buscou = false; o.fotos = []; fotoIdx = 0;
   mostrarFoto();
-};
-$('#fotoProx').onclick = ()=>{
+  if(!ponteViva){
+    // talvez a ponte tenha subido agora; confere antes de desistir
+    checarPonte().then(()=>{
+      if(ponteViva) buscarFotos(o);
+      else { o.buscou = true; mostrarFoto();
+             aviso('A ponte não respondeu. Abra a Central no computador e tente de novo.'); }
+    });
+    return;
+  }
+  buscarFotos(o);
+}
+$('#btRebuscar').onclick = rebuscarFotos;
+
+function passarFoto(passo){
   const o = ordemAtual();
-  fotoIdx = (fotoIdx + 1) % o.fotos.length;
+  if(!o || !o.fotos.length) return;
+  fotoIdx = (fotoIdx + passo + o.fotos.length) % o.fotos.length;
   mostrarFoto();
-};
+  if(!$('#lupa').hidden) abrirLupa();
+}
+$('#fotoAnt').onclick = ()=> passarFoto(-1);
+$('#fotoProx').onclick = ()=> passarFoto(1);
+
+/* ---------- foto em tela cheia ---------- */
+function abrirLupa(){
+  const o = ordemAtual();
+  if(!o || !o.fotos.length) return;
+  const f = o.fotos[fotoIdx] || o.fotos[0];
+  $('#lupaQual').textContent = (fotoIdx + 1) + ' / ' + o.fotos.length;
+  $('#lupaPalco').innerHTML = `<img src="${esc(f.url)}" alt="">`;
+  $('#lupa').hidden = false;
+
+  const img = $('#lupaPalco img');
+  img.onclick = ev=>{
+    img.classList.toggle('perto');
+    if(img.classList.contains('perto')) mirar(ev);
+    else img.style.transformOrigin = 'center';
+  };
+  // com a imagem aproximada, o mouse percorre a foto inteira
+  img.onmousemove = ev=>{ if(img.classList.contains('perto')) mirar(ev); };
+  function mirar(ev){
+    const r = img.getBoundingClientRect();
+    img.style.transformOrigin =
+      ((ev.clientX - r.left) / r.width * 100).toFixed(1) + '% ' +
+      ((ev.clientY - r.top) / r.height * 100).toFixed(1) + '%';
+  }
+}
+function fecharLupa(){ $('#lupa').hidden = true; $('#lupaPalco').innerHTML = ''; }
+$('#btLupa').onclick = abrirLupa;
+$('#lupaFechar').onclick = fecharLupa;
+$('#lupaAnt').onclick = ()=> passarFoto(-1);
+$('#lupaProx').onclick = ()=> passarFoto(1);
+$('#lupa').onclick = ev=>{ if(ev.target.id === 'lupa' || ev.target.id === 'lupaPalco') fecharLupa(); };
 
 /* ---------- fotos: busca a atual e adianta as próximas ----------
    Enquanto você avalia uma ordem, as seguintes já vão sendo
@@ -1309,6 +1468,14 @@ function registrar(){
 }
 
 async function concluir(){
+  const o = ordemAtual();
+  // trava: ordem que já está na planilha só passa depois de liberada
+  if(o && jaAvaliadas.has(String(o.os)) && !liberadas.has(String(o.os))
+     && !avaliacoes.some(a => a.os === o.os)){
+    conferirDuplicada();
+    aviso('Esta OS já foi avaliada. Use "Avaliar mesmo assim" se quiser substituir.');
+    return;
+  }
   const linha = registrar();
   enviarUma(linha);
 
@@ -1345,6 +1512,14 @@ $('#btVoltar').onclick = ()=>{
 addEventListener('keydown', e=>{
   if(!$('#t-aval').classList.contains('on')) return;
   if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+
+  // com a foto em tela cheia, o teclado é só dela
+  if(!$('#lupa').hidden){
+    if(e.key === 'Escape'){ e.preventDefault(); fecharLupa(); }
+    if(e.key === 'ArrowRight'){ e.preventDefault(); passarFoto(1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); passarFoto(-1); }
+    return;
+  }
 
   const c = CRITERIOS.find(x => x.tecla === e.key);
   if(c){ e.preventDefault(); alternar(c.id); return; }
@@ -1397,9 +1572,66 @@ async function conferirPlanilha(){
   if(!syncLigado()) return;
   try{
     const r = await syncChamar({acao:'avaliacoes', dias:0});
-    jaAvaliadas = new Set((r.avaliacoes || []).map(a => String(a.os)));
+    const linhas = r.avaliacoes || [];
+    jaAvaliadas = new Set(linhas.map(a => String(a.os)));
+    // guarda o que já está gravado para poder avisar com detalhe
+    fichaPlanilha = new Map();
+    linhas.forEach(a => fichaPlanilha.set(String(a.os), a));
     atualizarMenu();
+    if(location.hash === '#aval' && fila.length) conferirDuplicada();
   }catch(e){ /* segue sem o cruzamento */ }
+}
+
+/* ---------- trava contra avaliar duas vezes a mesma ordem ----------
+   A planilha regrava pela OS, então reavaliar corrige em vez de
+   duplicar — mas quase sempre isso é engano, então a ordem já
+   gravada chega travada e só destrava se a pessoa disser que quer. */
+function conferirDuplicada(){
+  const barra = $('#avDup');
+  const bt = $('#btConcluir');
+  if(!barra || !bt) return;
+  const o = ordemAtual();
+  const chave = o ? String(o.os) : '';
+  const naSessao = o && avaliacoes.some(a => a.os === o.os);
+  const repetida = o && jaAvaliadas.has(chave) && !naSessao && !liberadas.has(chave);
+
+  if(!repetida){
+    barra.hidden = true;
+    bt.disabled = false;
+    bt.textContent = 'Concluir e avançar';
+    return;
+  }
+
+  const f = fichaPlanilha.get(chave) || {};
+  const quando = diaIso(f.avaliadoEm) || diaIso(f.data);
+  const pedacos = [
+    quando ? 'gravada em ' + quando.split('-').reverse().join('/') : '',
+    (f.pontos === null || f.pontos === undefined || f.pontos === '')
+      ? (f.status ? String(f.status).toLowerCase() : '') : 'nota ' + f.pontos,
+    f.tecnico ? 'técnico ' + f.tecnico : '',
+  ].filter(Boolean).join(' · ');
+
+  barra.innerHTML = `
+    <div class="dupTxt"><b>Esta ordem já foi avaliada</b>
+      <span>OS ${esc(o.os)}${pedacos ? ' — ' + esc(pedacos) : ' — já consta na planilha'}.
+        Avaliar de novo substitui a linha que está lá.</span></div>
+    <button class="bt neutro" id="dupPular">Ir para a próxima pendente</button>
+    <button class="bt" id="dupSeguir">Avaliar mesmo assim</button>`;
+  barra.hidden = false;
+  bt.disabled = true;
+  bt.textContent = 'Já avaliada';
+
+  $('#dupPular').onclick = ()=>{
+    const p = fila.findIndex((x,i) => i > idx && !jaAvaliadas.has(String(x.os)));
+    const q = p >= 0 ? p : fila.findIndex(x => !jaAvaliadas.has(String(x.os)));
+    if(q < 0){ aviso('Não há mais ordens pendentes nesta fila.'); location.hash = '#lista'; return; }
+    idx = q; mostrarOrdem();
+  };
+  $('#dupSeguir').onclick = ()=>{
+    liberadas.add(chave);
+    conferirDuplicada();
+    aviso('Liberado. Ao concluir, a linha da planilha será substituída.');
+  };
 }
 
 /* Índice de ordens: no computador, saltar com o mouse é mais rápido
@@ -1450,12 +1682,13 @@ const corDaNota = n => (FAIXAS.find(f => n >= f.min) || FAIXAS[3]).cor;
 /* Os elos vão pela soma de pontos do período. Um técnico sobe de
    elo fazendo mais ordens, fazendo-as melhor, ou os dois. */
 const ELOS = [
+  {nome:'Esmeralda', min:120, cor:'#34F5B8', cor2:'#0E9F6E', brilho:'rgba(52,245,184,.38)'},
   {nome:'Diamante', min:80, cor:'#38BDF8', cor2:'#0EA5E9', brilho:'rgba(56,189,248,.35)'},
   {nome:'Ouro',     min:50, cor:'#F5C842', cor2:'#D9A520', brilho:'rgba(217,165,32,.35)'},
   {nome:'Prata',    min:25, cor:'#C8CCD0', cor2:'#9BA1A6', brilho:'rgba(155,161,166,.3)'},
   {nome:'Bronze',   min:0,  cor:'#D99B6C', cor2:'#B57647', brilho:'rgba(181,118,71,.3)'},
 ];
-const eloDe = soma => ELOS.find(e => soma >= e.min) || ELOS[3];
+const eloDe = soma => ELOS.find(e => soma >= e.min) || ELOS[ELOS.length - 1];
 function proximoElo(soma){
   const i = ELOS.findIndex(e => soma >= e.min);
   return i > 0 ? ELOS[i - 1] : null;
@@ -1646,9 +1879,10 @@ function desenharPainel(){
       <div class="pnCaixa" id="pnFalhas"></div>
     </div>
 
-    ${dias.length > 1 ? `
-      <h2>Evolução por dia</h2>
-      <div class="pnCaixa" id="pnOnda"></div>` : ''}
+    ${dias.length ? `
+      <h2>Ocorrências avaliadas por dia</h2>
+      <p class="pnSub">a altura é a quantidade de ordens · a cor é a nota média daquele dia</p>
+      <div class="pnCaixa" id="pnBarras"></div>` : ''}
 
     <h2>Ordens com nota baixa</h2>
     <div class="pnCaixa"><div id="pnBaixas"></div></div>
@@ -1662,7 +1896,7 @@ function desenharPainel(){
   if(comDia.length) desenharCeu(d);
   desenharRosa(d);
   desenharFalhas(d);
-  if(dias.length > 1) desenharOnda(comDia);
+  if(dias.length) desenharBarrasDia(comDia);
   desenharBaixas(comNota);
 }
 
@@ -1682,7 +1916,8 @@ function pergaminhoElos(equipe){
            style="--c:${elo.cor};--c2:${elo.cor2};--brilho:${elo.brilho}">
         <div class="eloIcone">${medalhaSvg(elo)}</div>
         <div class="eloNome">${elo.nome}</div>
-        <div class="eloFaixa">${elo.min ? elo.min + '+ pontos' : 'até ' + (ELOS[2].min - 1)}</div>
+        <div class="eloFaixa">${elo.min ? elo.min + '+ pontos'
+          : 'até ' + (ELOS[ELOS.length - 2].min - 1)}</div>
         <div class="eloGente">
           ${gente.length ? gente.map(t=>`<span onclick="focarTecnico('${esc(t.nome).replace(/'/g,"\\'")}')">
             ${esc(primeiroNome(t.nome))}<b>${t.soma}</b></span>`).join('')
@@ -1697,7 +1932,12 @@ function medalhaSvg(elo){
     <defs><linearGradient id="g${elo.nome}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="${elo.cor}"/><stop offset="100%" stop-color="${elo.cor2}"/>
     </linearGradient></defs>
-    ${elo.nome === 'Diamante'
+    ${elo.nome === 'Esmeralda'
+      ? `<path d="M16 6h16l9 9v18l-9 9H16l-9-9V15Z" fill="url(#g${elo.nome})"/>
+         <path d="M16 6h16l9 9H7Z" fill="#fff" opacity=".26"/>
+         <path d="M14 15h20v18H14Z" fill="#fff" opacity=".13"/>
+         <path d="M14 15 7 15v18l7 0Z" fill="#000" opacity=".10"/>`
+    : elo.nome === 'Diamante'
       ? `<path d="M24 5 41 19 24 43 7 19Z" fill="url(#g${elo.nome})"/>
          <path d="M24 5 41 19H7Z" fill="#fff" opacity=".22"/>
          <path d="M17 19 24 43 31 19Z" fill="#fff" opacity=".12"/>`
@@ -1742,7 +1982,7 @@ function desenharRanking(lista){
       <div class="rkPontos">
         <b>${t.soma}</b><span>pontos</span>
         ${falta > 0 ? `<i>faltam ${falta} para ${t.proximo.nome}</i>`
-                    : '<i class="topo">elo máximo</i>'}
+                    : '<i class="rkTopo">elo máximo</i>'}
       </div>
     </div>`;
   }).join('');
@@ -1947,7 +2187,126 @@ function desenharRosa(todas){
     </svg>`;
 }
 
-/* ---------- a onda dos dias ---------- */
+/* ---------- barras: ocorrências avaliadas por dia ----------
+   A altura conta quantas ordens foram avaliadas naquele dia; o
+   encaixe de cima, mais apagado, são os clientes ausentes. A cor
+   da barra vem da nota média do dia, então volume e qualidade
+   aparecem na mesma coluna. */
+function desenharBarrasDia(todas){
+  const cx = $('#pnBarras');
+  if(!cx) return;
+  const d = todas.filter(x => x.dia);
+  const porDia = {};
+  d.forEach(x=>{
+    const o = porDia[x.dia] = porDia[x.dia] || {avaliadas:0, ausentes:0, soma:0};
+    if(x.nota === null) o.ausentes++;
+    else { o.avaliadas++; o.soma += x.nota; }
+  });
+  const dias = Object.keys(porDia).sort();
+  if(!dias.length){
+    cx.innerHTML = '<p class="pnSub">Nenhuma ordem com data para montar o gráfico.</p>';
+    return;
+  }
+
+  const L = 900, A = 250, m = {t:30, r:18, b:48, l:40};
+  const passo = (L - m.l - m.r) / dias.length;
+  const larg  = Math.max(9, Math.min(58, passo * 0.6));
+  const raio  = Math.min(5, larg / 2.4);
+  const base  = A - m.b;
+
+  const totais = dias.map(dia => porDia[dia].avaliadas + porDia[dia].ausentes);
+  const teto   = Math.max(1, ...totais);
+  const escala = teto <= 4 ? teto + 1 : Math.ceil(teto * 1.12);
+  const py = v => base - (v / escala) * (base - m.t);
+  const meio = i => m.l + passo * i + passo / 2;
+
+  // régua horizontal com degraus redondos
+  const degrau = escala <= 5 ? 1 : escala <= 12 ? 2 : escala <= 30 ? 5 : Math.ceil(escala / 6 / 10) * 10;
+  const reguas = [];
+  for(let v = 0; v <= escala; v += degrau){
+    reguas.push(`<line x1="${m.l}" y1="${py(v)}" x2="${L - m.r}" y2="${py(v)}"
+      stroke="#EBEBED" stroke-width="1"/>
+      <text x="${m.l - 9}" y="${py(v) + 4}" text-anchor="end" class="pnEixo">${v}</text>`);
+  }
+
+  const mediaVol = d.length / dias.length;
+  const yMedia = py(mediaVol);
+  // desenhada como path: a regra do tema escuro recolore os <line>
+  const linhaMedia = `
+    <path d="M ${m.l} ${yMedia} L ${L - m.r} ${yMedia}" fill="none" stroke="#9BA1A6"
+          stroke-width="1.4" stroke-dasharray="6 5" opacity=".7"/>`;
+
+  const barras = dias.map((dia,i)=>{
+    const o = porDia[dia];
+    const total = o.avaliadas + o.ausentes;
+    const cor = o.avaliadas ? corDaNota(o.soma / o.avaliadas) : '#9BA1A6';
+    const x = meio(i) - larg / 2;
+    const yAv = py(o.avaliadas);
+    const yTot = py(total);
+    const atraso = 80 + i * 55;
+    const corpo = o.avaliadas ? `
+      <rect x="${x}" y="${yAv}" width="${larg}" height="${Math.max(1, base - yAv)}"
+            rx="${raio}" fill="${cor}" class="barraDia" data-i="${i}"
+            style="animation-delay:${atraso}ms"/>` : '';
+    const capa = o.ausentes ? `
+      <rect x="${x}" y="${yTot}" width="${larg}" height="${Math.max(1, yAv - yTot)}"
+            rx="${raio}" fill="${cor}" opacity=".28" class="barraAus" data-i="${i}"
+            style="animation-delay:${atraso + 60}ms"/>` : '';
+    return corpo + capa + `
+      <text x="${meio(i)}" y="${yTot - 9}" text-anchor="middle" class="barraVal"
+            style="animation-delay:${atraso + 260}ms">${o.avaliadas || ''}</text>
+      <rect x="${meio(i) - passo/2}" y="${m.t}" width="${passo}" height="${base - m.t}"
+            fill="transparent" class="barraAlvo" data-i="${i}"/>`;
+  }).join('');
+
+  // com muitos dias, só algumas datas ficam escritas
+  const salto = Math.ceil(dias.length / 14);
+  const rotulos = dias.map((dia,i)=> (i % salto) ? '' : `
+    <text x="${meio(i)}" y="${A - 16}" text-anchor="middle" class="pnEixo">
+      ${dia.slice(8)}/${dia.slice(5,7)}</text>`).join('');
+
+  const temAusente = dias.some(dia => porDia[dia].ausentes);
+
+  cx.innerHTML = `
+    <svg viewBox="0 0 ${L} ${A}" class="pnSvg">
+      ${reguas.join('')}
+      ${linhaMedia}
+      ${barras}
+      ${rotulos}
+    </svg>
+    <div class="barraLeg">
+      <span><i style="background:#4ADE80"></i>nota alta</span>
+      <span><i style="background:#F0CE8A"></i>nota média</span>
+      <span><i style="background:#F2787F"></i>nota baixa</span>
+      ${temAusente ? '<span><i style="background:#4ADE80;opacity:.28"></i>cliente ausente</span>' : ''}
+      <span><i style="background:none;border-top:2px dashed #9BA1A6;height:0;width:14px;
+        border-radius:0"></i>média ${mediaVol.toFixed(1).replace('.', ',')} ordens/dia</span>
+    </div>
+    <div class="pnDica" id="pnDicaDia" hidden></div>`;
+
+  const dica = $('#pnDicaDia');
+  $$('#pnBarras .barraAlvo').forEach(alvo=>{
+    alvo.onmouseenter = ()=>{
+      const i = +alvo.dataset.i, o = porDia[dias[i]];
+      const med = o.avaliadas ? (o.soma / o.avaliadas) : null;
+      dica.innerHTML = `<b>${brData(dias[i])}</b>
+        <span>${o.avaliadas} avaliada${o.avaliadas === 1 ? '' : 's'}${
+          o.ausentes ? ' · ' + o.ausentes + ' ausente' + (o.ausentes === 1 ? '' : 's') : ''}</span>
+        <span>${o.soma} ponto${o.soma === 1 ? '' : 's'} no dia</span>
+        ${med === null ? '<i style="color:#9BA1A6">sem nota</i>'
+          : `<i style="color:${corDaNota(med)}">média ${med.toFixed(1)}</i>`}`;
+      dica.hidden = false;
+      const cr = cx.getBoundingClientRect(), r = alvo.getBoundingClientRect();
+      dica.style.left = Math.max(8, Math.min(r.left - cr.left + r.width/2 - 60,
+                                             cr.width - 190)) + 'px';
+      dica.style.top = (py(porDia[dias[i]].avaliadas + porDia[dias[i]].ausentes)
+                        / 250 * cr.height) + 'px';
+    };
+    alvo.onmouseleave = ()=> dica.hidden = true;
+  });
+}
+
+/* ---------- a onda dos dias (guardada: o painel usa as barras) ---------- */
 function desenharOnda(todas){
   const d = todas.filter(x => x.dia && x.nota !== null);
   const L = 900, A = 170, m = {t:14, r:16, b:28, l:34};
