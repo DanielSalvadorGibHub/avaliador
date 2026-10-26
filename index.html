@@ -645,7 +645,7 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
 .heroiLinha span{font-size:11.5px;color:var(--txt3)}
 
 /* ---------- elos ---------- */
-.elos{display:grid;grid-template-columns:repeat(auto-fit,minmax(176px,1fr));gap:12px;margin:14px 0 8px}
+.elos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin:14px 0 8px}
 .eloCard{position:relative;background:var(--sup);border:1px solid var(--risco);
   border-radius:var(--r-g);padding:20px 16px 15px;text-align:center;overflow:hidden;
   transition:transform .18s var(--curva),border-color .18s}
@@ -787,7 +787,7 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
       <span class="capaQuem"><i>DS</i>
         <div><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></div></span>
       <span class="capaEstado" id="capaEstado"></span>
-      <span class="capaVer">versão 13</span>
+      <span class="capaVer">versão 14</span>
     </footer>
   </div>
 </div>
@@ -1877,11 +1877,12 @@ const corDaNota = n => (FAIXAS.find(f => n >= f.min) || FAIXAS[3]).cor;
 /* Os elos vão pela soma de pontos do período. Um técnico sobe de
    elo fazendo mais ordens, fazendo-as melhor, ou os dois. */
 const ELOS = [
-  {nome:'Esmeralda', min:120, cor:'#34F5B8', cor2:'#0E9F6E', brilho:'rgba(52,245,184,.38)'},
-  {nome:'Diamante', min:80, cor:'#38BDF8', cor2:'#0EA5E9', brilho:'rgba(56,189,248,.35)'},
-  {nome:'Ouro',     min:50, cor:'#F5C842', cor2:'#D9A520', brilho:'rgba(217,165,32,.35)'},
-  {nome:'Prata',    min:25, cor:'#D6DCE0', cor2:'#9BA3A9', brilho:'rgba(214,220,224,.26)'},
-  {nome:'Bronze',   min:0,  cor:'#D99B6C', cor2:'#B57647', brilho:'rgba(181,118,71,.3)'},
+  {nome:'Esmeralda', min:500, cor:'#34F5B8', cor2:'#0E9F6E', brilho:'rgba(52,245,184,.38)'},
+  {nome:'Diamante',  min:400, cor:'#38BDF8', cor2:'#0EA5E9', brilho:'rgba(56,189,248,.35)'},
+  {nome:'Platina',   min:300, cor:'#DCE6F5', cor2:'#8E9EC6', brilho:'rgba(220,230,245,.3)'},
+  {nome:'Ouro',      min:200, cor:'#F5C842', cor2:'#D9A520', brilho:'rgba(217,165,32,.35)'},
+  {nome:'Prata',     min:100, cor:'#D6DCE0', cor2:'#9BA3A9', brilho:'rgba(214,220,224,.26)'},
+  {nome:'Bronze',    min:0,   cor:'#D99B6C', cor2:'#B57647', brilho:'rgba(181,118,71,.3)'},
 ];
 const eloDe = soma => ELOS.find(e => soma >= e.min) || ELOS[ELOS.length - 1];
 function proximoElo(soma){
@@ -2122,23 +2123,63 @@ function pergaminhoElos(equipe){
   </div>`;
 }
 
+/* As seis insígnias são uma família só, e a progressão se lê de
+   relance: as três primeiras são medalhas cunhadas, com uma, duas e
+   três divisas; as três últimas são pedras lapidadas, cada uma com
+   mais facetas que a anterior. Todas repousam sobre a mesma sombra
+   elíptica, que é o que dá unidade ao conjunto. */
+let selo = 0;
 function medalhaSvg(elo){
+  const g = 'g' + elo.nome + (++selo);          // cada svg com o seu gradiente
+  const divisas = n => Array.from({length:n}, (_,i)=>
+    `<path d="M17.8 ${29.5 - i*5.6}l6.2 -5.1 6.2 5.1" stroke="#fff" stroke-opacity=".92"
+       stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`).join('');
+  const moeda = n => `
+    <circle cx="24" cy="24" r="15" fill="url(#${g})"/>
+    <path d="M24 9a15 15 0 0 1 0 30Z" fill="#000" opacity=".12"/>
+    <circle cx="24" cy="24" r="15" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1.3"/>
+    <circle cx="24" cy="24" r="11" fill="#000" opacity=".14"/>
+    ${divisas(n)}`;
+
+  const formas = {
+    Bronze: moeda(1),
+    Prata:  moeda(2),
+    Ouro:   moeda(3),
+    /* cristal bruto: a primeira pedra da escada, alta e estreita */
+    Platina: `
+      <path d="M24 4 37 18 24 44 11 18Z" fill="url(#${g})"/>
+      <path d="M24 4 11 18h13Z" fill="#fff" opacity=".2"/>
+      <path d="M24 4 37 18H24Z" fill="#fff" opacity=".36"/>
+      <path d="M24 18h13L24 44Z" fill="#000" opacity=".16"/>
+      <path d="M11 18h26" stroke="#fff" stroke-opacity=".3" stroke-width="1.1"/>
+      <path d="M24 4v40" stroke="#fff" stroke-opacity=".22" stroke-width="1.1"/>`,
+    /* brilhante: coroa facetada e pavilhão em ponta */
+    Diamante: `
+      <path d="M16 7h16l8 13-16 22L8 20Z" fill="url(#${g})"/>
+      <path d="M16 7h16l8 13H8Z" fill="#fff" opacity=".26"/>
+      <path d="M16 7 24 20 32 7Z" fill="#fff" opacity=".2"/>
+      <path d="M32 7l8 13-16 22Z" fill="#000" opacity=".14"/>
+      <path d="M16 20 24 42 32 20Z" fill="#fff" opacity=".14"/>
+      <path d="M8 20h32" stroke="#fff" stroke-opacity=".34" stroke-width="1.2"/>`,
+    /* lapidação esmeralda: degraus retos e um brilho no canto */
+    Esmeralda: `
+      <path d="M17 5h14l8 8v22l-8 8H17l-8-8V13Z" fill="url(#${g})"/>
+      <path d="M17 5h14l8 8H9Z" fill="#fff" opacity=".3"/>
+      <path d="M9 35h30l-8 8H17Z" fill="#000" opacity=".16"/>
+      <path d="M9 13h6v22H9Z" fill="#000" opacity=".14"/>
+      <path d="M33 13h6v22h-6Z" fill="#fff" opacity=".1"/>
+      <path d="M15 17h18v14H15Z" fill="#fff" opacity=".14"/>
+      <path d="M15 13h18M15 35h18" stroke="#fff" stroke-opacity=".26" stroke-width="1.1"/>
+      <path d="M40.5 6.5 42 10l3.5 1.5L42 13l-1.5 3.5L39 13l-3.5-1.5L39 10Z"
+            fill="#fff" opacity=".85"/>`,
+  };
+
   return `<svg viewBox="0 0 48 48" fill="none">
-    <defs><linearGradient id="g${elo.nome}" x1="0" y1="0" x2="1" y2="1">
+    <defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="${elo.cor}"/><stop offset="100%" stop-color="${elo.cor2}"/>
     </linearGradient></defs>
-    ${elo.nome === 'Esmeralda'
-      ? `<path d="M16 6h16l9 9v18l-9 9H16l-9-9V15Z" fill="url(#g${elo.nome})"/>
-         <path d="M16 6h16l9 9H7Z" fill="#fff" opacity=".26"/>
-         <path d="M14 15h20v18H14Z" fill="#fff" opacity=".13"/>
-         <path d="M14 15 7 15v18l7 0Z" fill="#000" opacity=".10"/>`
-    : elo.nome === 'Diamante'
-      ? `<path d="M24 5 41 19 24 43 7 19Z" fill="url(#g${elo.nome})"/>
-         <path d="M24 5 41 19H7Z" fill="#fff" opacity=".22"/>
-         <path d="M17 19 24 43 31 19Z" fill="#fff" opacity=".12"/>`
-      : `<circle cx="24" cy="26" r="15" fill="url(#g${elo.nome})"/>
-         <circle cx="24" cy="26" r="10.5" fill="#fff" opacity=".16"/>
-         <path d="M15 4h7l-3 11-6-2Zm18 0h-7l3 11 6-2Z" fill="url(#g${elo.nome})" opacity=".8"/>`}
+    <ellipse cx="24" cy="45" rx="11" ry="2" fill="url(#${g})" opacity=".3"/>
+    ${formas[elo.nome] || moeda(1)}
   </svg>`;
 }
 
