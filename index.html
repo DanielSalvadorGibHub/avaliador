@@ -726,6 +726,73 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
 #t-painel .barraVal{fill:var(--txt2)}
 #t-painel .linhaCinco{stroke:var(--sinal)}
 #t-painel .pnPonto{stroke:rgba(0,0,0,.35);stroke-width:.6}
+/* ============ alertas de material ============
+   O robô compara o que o técnico escreveu no encerramento com o que
+   ele baixou na OS. É aviso, não nota: âmbar para divergência,
+   vermelho só para quando a consulta falhou. */
+.etq.mat{cursor:pointer;font:600 11.5px var(--ui);transition:filter .15s,transform .15s}
+.etq.mat:hover{filter:brightness(1.18)}
+.etq.mat:active{transform:scale(.97)}
+.etq.mat.div{background:var(--alerta-f);color:var(--alerta);border-color:rgba(243,190,94,.32)}
+.etq.mat.err{background:var(--falha-f);color:var(--falha);border-color:rgba(255,122,122,.32)}
+.mtFaixa{display:flex;align-items:center;gap:10px;background:var(--sup);border:1px solid var(--risco);
+  border-radius:var(--r-m);padding:11px 15px;font-size:13px;color:var(--txt2);margin:4px 0 6px}
+.mtFaixa::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--alerta);flex:0 0 auto;
+  box-shadow:0 0 10px rgba(243,190,94,.6)}
+.mtFaixa b{color:var(--txt);font-weight:600}
+.mtRotulo{font:600 12px var(--ui);color:var(--txt3);margin:20px 0 8px;letter-spacing:.01em}
+.pnChip i{font:600 11px var(--mono);font-style:normal;margin-left:7px;opacity:.75}
+.pnChip.zero i{opacity:.35}
+.mtLista{display:flex;flex-direction:column;gap:6px}
+.mtItem{position:relative;display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:14px;
+  align-items:start;background:var(--sup);border:1px solid var(--risco);border-radius:var(--r-m);
+  padding:13px 15px 13px 17px;overflow:hidden;animation:surge .26s var(--curva) both;
+  transition:border-color .15s,background .15s}
+.mtItem:hover{background:var(--sup2);border-color:#32423A}
+.mtItem::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--txt3);opacity:.45}
+.mtItem.div::before{background:var(--alerta);opacity:.95}
+.mtItem.err::before{background:var(--falha);opacity:.95}
+.mtItem.ok::before{background:var(--sinal);opacity:.8}
+.mtOS{font:500 12px var(--mono);color:var(--txt3);padding-top:2px;letter-spacing:.02em}
+.mtTxt{min-width:0}
+.mtTxt b{display:block;font-size:14.5px;font-weight:600;letter-spacing:-.012em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtTxt small{display:block;font-size:12px;color:var(--txt3);margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtDet{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.mtDet li{position:relative;padding-left:15px;font:500 12.5px/1.5 var(--mono);color:var(--txt2)}
+.mtDet li::before{content:'';position:absolute;left:3px;top:.62em;width:5px;height:5px;border-radius:50%;
+  background:var(--alerta)}
+.mtItem.err .mtDet li::before{background:var(--falha)}
+.mtSelo{font:600 11.5px var(--ui);padding:4px 11px;border-radius:980px;white-space:nowrap;
+  border:1px solid var(--risco);background:var(--sup2);color:var(--txt3)}
+.mtSelo.div{background:var(--alerta-f);color:var(--alerta);border-color:rgba(243,190,94,.3)}
+.mtSelo.err{background:var(--falha-f);color:var(--falha);border-color:rgba(255,122,122,.3)}
+.mtSelo.ok{background:var(--sinal-f);color:var(--sinal);border-color:rgba(61,220,132,.28)}
+.mtVazio{color:var(--txt3);font-size:13.5px;padding:18px 2px}
+.leitorCx .mtDet li{font-size:13.5px}
+/* ============ OS do Drive ============ */
+.drive{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--sup);
+  border:1px solid var(--risco);border-radius:var(--r-g);padding:16px 18px;margin-bottom:14px;
+  animation:surge .24s var(--curva) both}
+.drive .dIco{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto;
+  background:var(--sinal-f);color:var(--sinal);border:1px solid rgba(61,220,132,.28)}
+.drive .dIco svg{width:20px;height:20px}
+.drive .dTxt{flex:1;min-width:200px}
+.drive .dTxt b{display:block;font:600 14.5px var(--ui);letter-spacing:-.012em;color:var(--txt)}
+.drive .dTxt small{display:block;font-size:12.5px;color:var(--txt3);margin-top:1px}
+.drive select{background:var(--sup2);border:1px solid var(--risco);border-radius:var(--r-p);
+  color:var(--txt);font:500 13.5px var(--ui);padding:9px 12px;min-width:230px;cursor:pointer}
+.drive select:focus{outline:0;border-color:#365444;box-shadow:var(--luz)}
+.drive.apagado .dIco{background:var(--sup2);color:var(--txt3);border-color:var(--risco)}
+.drive .ok{color:var(--sinal);font-weight:600}
+@media(max-width:640px){
+  .abas{overflow-x:auto;scrollbar-width:none;max-width:calc(100vw - 150px)}
+  .abas::-webkit-scrollbar{display:none}
+  .abas button{padding:6px 11px;flex:0 0 auto}
+  .mtItem{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px}
+  .mtOS{grid-column:1/-1;padding:0}
+}
 </style>
 </head>
 <body>
@@ -741,6 +808,7 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
     <button data-ir="arquivo">Arquivo</button>
     <button data-ir="lista">Ordens</button>
     <button data-ir="painel">Painel</button>
+    <button data-ir="material">Material</button>
     <button data-ir="ajustes">Ajustes</button>
   </nav>
 </div>
@@ -787,7 +855,7 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
       <span class="capaQuem"><i>DS</i>
         <div><b>Daniel Salvador</b><small>Estoque · Direct Internet</small></div></span>
       <span class="capaEstado" id="capaEstado"></span>
-      <span class="capaVer">versão 14</span>
+      <span class="capaVer">versão 16</span>
     </footer>
   </div>
 </div>
@@ -798,6 +866,7 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
     <p class="olho">Passo 1</p><h1>Relatório de ordens finalizadas</h1>
   </div></div>
   <div class="rola"><div class="meio">
+    <div id="driveCx"></div>
     <div class="solte" id="solte">
       <svg class="solteIco" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6">
         <path d="M13 6h14l8 8v26a2 2 0 0 1-2 2H13a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/>
@@ -805,9 +874,10 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
         <path d="M23 34V22m0 0-5 5m5-5 5 5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <b>Solte a planilha aqui</b>
-      <small>ou clique para escolher · .xlsx ou .csv exportado do HubSoft</small>
+      <small>ou clique para escolher · .xlsx ou .csv exportado do HubSoft ·
+        pode soltar junto o <span style="font-family:var(--mono)">materiais_…xlsx</span> do robô</small>
     </div>
-    <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" hidden>
+    <input type="file" id="arquivo" accept=".xlsx,.xls,.csv" multiple hidden>
 
     <div class="duasNotas">
       <div class="nota">
@@ -823,6 +893,7 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
       </div>
     </div>
     <div id="lido"></div>
+    <div id="lidoMat"></div>
   </div></div>
 </div>
 
@@ -868,6 +939,7 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
         <span class="etq" id="fData" hidden></span>
         <span class="etq" id="fTecnico" hidden></span>
         <span class="etq" id="fPlano" hidden></span>
+        <button class="etq mat" id="fMaterial" hidden title="ver o alerta de material"></button>
       </div>
       <p class="fichaEnd" id="fEndereco" hidden></p>
 
@@ -939,6 +1011,14 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
   <div class="rola"><div class="meio largo" id="painelCorpo"></div></div>
 </div>
 
+<!-- ======== MATERIAL ======== -->
+<div class="tela" id="t-material">
+  <div class="topo"><div class="meio largo">
+    <p class="olho" id="mtOlho">Alertas de material</p><h1>Descrição × baixa no HubSoft</h1>
+  </div></div>
+  <div class="rola"><div class="meio largo" id="materialCorpo"></div></div>
+</div>
+
 <!-- ======== AJUSTES ======== -->
 <div class="tela" id="t-ajustes">
   <div class="topo"><div class="meio">
@@ -961,6 +1041,12 @@ h2{font:600 18px var(--disp);letter-spacing:-.025em;margin:28px 0 10px;color:var
       <label for="cPonte">Endereço da ponte</label>
       <input type="text" id="cPonte" placeholder="http://localhost:8765" autocomplete="off" spellcheck="false">
       <small>Programa local que busca as fotos no HubSoft. Em branco, avalia só pelas descrições.</small>
+    </div>
+    <div class="campo">
+      <label for="cFonte">Fonte das OS (robô do HubSoft)</label>
+      <input type="text" id="cFonte" class="sigilo" placeholder="https://script.google.com/…/exec?chave=…"
+             autocomplete="off" spellcheck="false">
+      <small>Com ela, o avaliador puxa sozinho do Drive as OS de ontem e os alertas de material.</small>
     </div>
     <div class="campo">
       <label for="cNome">Seu nome</label>
@@ -1047,7 +1133,8 @@ function calcularNota(m){
 }
 
 /* ---------- estado ---------- */
-let cfg = {sync:'', segredo:'', ponte:'http://localhost:8765', nome:''};
+let cfg = {sync:'', segredo:'', ponte:'http://localhost:8765', nome:'', fonte:''};
+let filaDia = '';                // dia das OS carregadas (AAAA-MM-DD), quando se sabe
 let fila = [], idx = 0, fotoIdx = 0;
 let marcas = {};                 // marcações da ordem atual
 let avaliacoes = [];             // o que foi concluído nesta sessão
@@ -1069,7 +1156,7 @@ function aviso(t, ms){
 /* ===========================================================
    Navegação por hash, como no manual dos equipamentos
    =========================================================== */
-const TELAS = ['capa','arquivo','lista','aval','painel','ajustes'];
+const TELAS = ['capa','arquivo','lista','aval','painel','material','ajustes'];
 
 const K_TELA = 'avaliador:tela';
 
@@ -1096,6 +1183,8 @@ function irPara(nome){
   if(nome === 'lista') desenharLista();
   if(nome === 'aval') mostrarOrdem();
   if(nome === 'painel') abrirPainel();
+  if(nome === 'material') desenharMaterial();
+  if(nome === 'arquivo') desenharDrive();
   if(nome === 'ajustes') escreverConfig();
 }
 
@@ -1156,7 +1245,15 @@ async function lerArquivo(file){
   const wb = XLSX.read(buf, {type:'array', cellDates:true});
   const aoa = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, defval:''});
   if(aoa.length < 2){ aviso('A planilha está vazia.'); return; }
+  // o arquivo de alertas do robô tem a coluna "detalhe": vai para outro lugar
+  if(ehMateriais(aoa[0])){ lerMateriais(aoa, file.name); return; }
+  await lerPlanilha(aoa, file.name);
+}
 
+/* Lê as ordens já em linhas (do Excel ou do Drive). O nome traz o dia
+   quando vem do robô: os_2026-10-31.xlsx. */
+async function lerPlanilha(aoa, nome){
+  if(aoa.length < 2){ aviso('A planilha está vazia.'); return; }
   const cab = aoa[0].map(x => String(x || ''));
   const col = {};
   Object.entries(COLUNAS).forEach(([k, chaves])=>{ col[k] = acharColuna(cab, chaves); });
@@ -1183,6 +1280,7 @@ async function lerArquivo(file){
       fotos: [], buscou: false,
     };
   }).filter(Boolean);
+  filaDia = (String(nome || '').match(/(\d{4}-\d{2}-\d{2})/) || [,''])[1];
 
   const fechadas = fila.filter(o => FECHADA.test(o.status) || o.data).length;
   const total = fila.length;
@@ -1194,7 +1292,7 @@ async function lerArquivo(file){
         ? '<br><b style="color:var(--alerta)">A coluna de encerramento não foi reconhecida</b>' : ''}
       ${repetidas ? `<br>${repetidas} linha(s) com OS repetida foram descartadas` : ''}
     </div>
-    <button class="btnFull" style="margin-top:14px" data-go="lista">Ver o que falta avaliar</button>`;
+    <div class="linhaBt"><button class="bt" data-ir="lista">Ver o que falta avaliar</button></div>`;
 
   guardar();
   mostrarEstado();
@@ -1211,7 +1309,12 @@ const soHora = t => (String(t||'').match(/(\d{2}:\d{2})/) || [,''])[1];
 /* ---------- arquivo: soltar ou escolher ---------- */
 const drop = $('#solte');
 drop.onclick = ()=> $('#arquivo').click();
-$('#arquivo').onchange = e => { if(e.target.files[0]) lerArquivo(e.target.files[0]); };
+async function lerVarios(lista){
+  // os alertas por último: o aviso final é o deles, que é o mais curto
+  const fs = [...lista].sort((a, b) => /materia/i.test(a.name) - /materia/i.test(b.name));
+  for(const f of fs) await lerArquivo(f);
+}
+$('#arquivo').onchange = e => { if(e.target.files.length) lerVarios(e.target.files); e.target.value = ''; };
 ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{
   e.preventDefault(); drop.classList.add('sobre');
 }));
@@ -1219,8 +1322,7 @@ $('#arquivo').onchange = e => { if(e.target.files[0]) lerArquivo(e.target.files[
   e.preventDefault(); drop.classList.remove('sobre');
 }));
 drop.addEventListener('drop', e=>{
-  const f = e.dataTransfer.files[0];
-  if(f) lerArquivo(f);
+  if(e.dataTransfer.files.length) lerVarios(e.dataTransfer.files);
 });
 
 /* ===========================================================
@@ -1324,6 +1426,7 @@ function mostrarOrdem(){
   etiqueta('#fTecnico', tecnicoDaOrdem(o));
   etiqueta('#fPlano', o.plano || (o.contrato && 'contrato ' + o.contrato));
   etiqueta('#fEndereco', o.endereco);
+  marcarMaterial(o);
 
   escreverTexto('#fAbertura', o.abertura);
   escreverTexto('#fFechamento', o.fechamento);
@@ -2633,6 +2736,7 @@ function escreverConfig(){
   $('#cSegredo').value = cfg.segredo || '';
   $('#cPonte').value = cfg.ponte || '';
   $('#cNome').value = cfg.nome || '';
+  $('#cFonte').value = cfg.fonte || '';
 }
 
 $('#btSalvar').onclick = ()=>{
@@ -2645,7 +2749,14 @@ $('#btSalvar').onclick = ()=>{
   cfg.segredo = $('#cSegredo').value.trim();
   cfg.ponte = $('#cPonte').value.trim();
   cfg.nome = $('#cNome').value.trim();
+  const fonte = $('#cFonte').value.trim();
+  if(fonte && !/^https:\/\/script\.google(usercontent)?\.com\/.*(exec|echo)/.test(fonte)){
+    mostrarCfg('A Fonte das OS deve ser a URL do Apps Script (termina em /exec?chave=…).', 'erro');
+    return;
+  }
+  cfg.fonte = fonte;
   localStorage.setItem(K, JSON.stringify(cfg));
+  puxarDoDrive(true);
   mostrarCfg('Salvo.' + (url ? '' : ' Sem planilha, as avaliações ficam só neste navegador.'), '');
   checarPonte();
   conferirPlanilha();
@@ -2668,12 +2779,291 @@ function mostrarCfg(txt, classe){
   el.hidden = false;
 }
 
+/* ===========================================================
+   Alertas de material
+   O robô do HubSoft compara o material escrito no encerramento
+   com o que o técnico baixou na OS. É só alerta: nada daqui
+   entra na nota, nos pontos ou no ranking.
+   =========================================================== */
+const KM = 'avaliador:material';
+let material = {dia:'', linhas:[], quando:0};
+let mtFiltro = {tec:'', st:'', busca:''};
+
+const MT = {
+  DIVERGENTE: {cls:'div', selo:'Divergente',               plural:'divergentes', ordem:0},
+  ERRO:       {cls:'err', selo:'Erro ao consultar',        plural:'com erro',    ordem:1},
+  CONFERE:    {cls:'ok',  selo:'Confere',                  plural:'conferem',    ordem:2},
+  SEM:        {cls:'sem', selo:'Sem material na descrição', plural:'sem material', ordem:3},
+};
+
+function mtTipo(st){
+  const s = norm(st);
+  if(s.startsWith('diverg')) return 'DIVERGENTE';
+  if(s.startsWith('erro'))   return 'ERRO';
+  if(s.startsWith('confere'))return 'CONFERE';
+  return 'SEM';
+}
+
+function ehMateriais(cab){
+  const n = cab.map(norm);
+  return n.includes('detalhe') && n.some(h => ['num o s','numero os','os'].includes(h));
+}
+
+function lerMateriais(aoa, nome){
+  const n = aoa[0].map(norm);
+  const c = (...ks) => n.findIndex(h => ks.includes(h));
+  const cOS = c('num o s','numero os','os'), cCli = c('cliente'), cTec = c('tecnicos','tecnico'),
+        cSt = c('status'), cDet = c('detalhe');
+  const val = (l, i) => i >= 0 ? String(l[i] ?? '').trim() : '';
+  const linhas = aoa.slice(1).map(l => ({
+    os: val(l, cOS), cliente: val(l, cCli), tecnico: val(l, cTec),
+    tipo: mtTipo(val(l, cSt)),
+    itens: val(l, cDet).split(' | ').map(t => t.trim()).filter(t => t && t !== '-'),
+  })).filter(x => x.os && x.os !== '-');
+
+  const dia = (String(nome || '').match(/(\d{4}-\d{2}-\d{2})/) || [,''])[1];
+  material = {dia, linhas, quando: Date.now()};
+  try{ localStorage.setItem(KM, JSON.stringify(material)); }catch(e){ /* segue só na memória */ }
+  mtFiltro = {tec:'', st:'', busca:''};
+
+  const div = linhas.filter(x => x.tipo === 'DIVERGENTE').length;
+  $('#lidoMat').innerHTML = `
+    <div class="aviso ${div ? 'amb' : ''}" style="margin-top:12px">
+      <b>Alertas de material${dia ? ' de ' + brData(dia) : ''}</b>
+      ${linhas.length} ordens conferidas · ${div} divergente${div === 1 ? '' : 's'}.
+      Não altera nenhuma nota.
+    </div>
+    <div class="linhaBt"><button class="bt neutro" data-ir="material">Ver alertas de material</button></div>`;
+  aviso('Alertas de material carregados · ' + div + ' divergente' + (div === 1 ? '' : 's') + '.');
+  if($('#t-aval').classList.contains('on')) marcarMaterial(ordemAtual());
+}
+
+const mtDaOS = os => material.linhas.find(x => x.os === String(os));
+
+/* Na avaliação, a ordem com divergência ganha uma etiqueta âmbar.
+   Clicar mostra o detalhe; a nota continua a mesma. */
+function marcarMaterial(o){
+  const el = $('#fMaterial');
+  if(!el) return;
+  const m = o && mtDaOS(o.os);
+  if(!m || (m.tipo !== 'DIVERGENTE' && m.tipo !== 'ERRO')){ el.hidden = true; return; }
+  el.className = 'etq mat ' + MT[m.tipo].cls;
+  el.textContent = m.tipo === 'DIVERGENTE' ? '⚠ material divergente' : 'material: erro ao consultar';
+  el.onclick = ()=> verMaterial(m);
+  el.hidden = false;
+}
+
+function verMaterial(m){
+  $('#lerTit').textContent = 'Alerta de material';
+  $('#lerSub').textContent = (m.cliente || '') + ' · OS ' + m.os;
+  $('#lerCorpo').innerHTML = `
+    <ul class="mtDet">${m.itens.map(t => `<li>${esc(t)}</li>`).join('') ||
+      '<li>sem detalhe</li>'}</ul>
+    <p style="margin-top:16px;font-size:13px;color:var(--txt3)">Só alerta: não muda a nota desta ordem.
+      Use para cobrar o técnico ou corrigir a baixa no HubSoft.</p>`;
+  $('#leitor').hidden = false;
+}
+
+window.mtFiltrar = (campo, v) => { mtFiltro[campo] = mtFiltro[campo] === v ? '' : v; desenharMaterial(); };
+
+function desenharMaterial(){
+  const el = $('#materialCorpo');
+  const L = material.linhas;
+  $('#mtOlho').textContent = 'Alertas de material' + (material.dia ? ' · ' + brData(material.dia) : '');
+
+  if(!L.length){
+    el.innerHTML = `
+      <p class="aviso amb" style="margin-top:4px"><b>Nenhum alerta carregado</b>
+        Solte o <span style="font-family:var(--mono)">materiais_AAAA-MM-DD.xlsx</span> que o robô gera
+        junto com o <span style="font-family:var(--mono)">os_…xlsx</span> na aba Arquivo.</p>
+      <div class="linhaBt"><button class="bt" data-ir="arquivo">Ir para Arquivo</button></div>`;
+    return;
+  }
+
+  const conta = t => L.filter(x => x.tipo === t).length;
+  const equipe = {};
+  L.forEach(x=>{
+    const t = responsavel(x.tecnico);
+    equipe[t] = equipe[t] || {nome:t, div:0, total:0};
+    equipe[t].total++;
+    if(x.tipo === 'DIVERGENTE') equipe[t].div++;
+  });
+  const tecs = Object.values(equipe).sort((a,b) => b.div - a.div || a.nome.localeCompare(b.nome));
+
+  const b = norm(mtFiltro.busca);
+  const vis = L.filter(x =>
+      (!mtFiltro.tec || responsavel(x.tecnico) === mtFiltro.tec) &&
+      (!mtFiltro.st  || x.tipo === mtFiltro.st) &&
+      (!b || norm([x.cliente, x.os, x.tecnico, x.itens.join(' ')].join(' ')).includes(b)))
+    .sort((p,q) => MT[p.tipo].ordem - MT[q.tipo].ordem || p.tecnico.localeCompare(q.tecnico));
+
+  const q = s => esc(s).replace(/'/g, "\\'");
+  const chipSt = (t, rot) => `<button class="pnChip ${mtFiltro.st === t ? 'on' : ''} ${conta(t) ? '' : 'zero'}"
+      onclick="mtFiltrar('st','${t}')">${rot}<i>${conta(t)}</i></button>`;
+
+  el.innerHTML = `
+    <div class="mtFaixa"><span><b>Só alerta.</b> Nada aqui entra na nota, nos pontos ou no ranking —
+      serve para cobrar o técnico ou corrigir a baixa no HubSoft.</span></div>
+
+    <div class="numeros">
+      <div class="numero"><b>${L.length}</b><span>ordens conferidas</span></div>
+      <div class="numero ${conta('DIVERGENTE') ? 'amb' : 'bom'}"><b>${conta('DIVERGENTE')}</b><span>divergentes</span></div>
+      <div class="numero verde"><b>${conta('CONFERE')}</b><span>conferem</span></div>
+      <div class="numero bom"><b>${conta('SEM')}</b><span>sem material na descrição</span></div>
+      ${conta('ERRO') ? `<div class="numero vm"><b>${conta('ERRO')}</b><span>erro ao consultar</span></div>` : ''}
+    </div>
+
+    <p class="mtRotulo">Divergências por técnico</p>
+    <div class="pnChips">
+      <button class="pnChip ${!mtFiltro.tec ? 'on' : ''}" onclick="mtFiltrar('tec','')">Todos</button>
+      ${tecs.map(t => `<button class="pnChip ${mtFiltro.tec === t.nome ? 'on' : ''} ${t.div ? '' : 'zero'}"
+          onclick="mtFiltrar('tec','${q(t.nome)}')" title="${t.total} ordens no dia">${esc(t.nome)}<i>${t.div}</i></button>`).join('')}
+    </div>
+
+    <p class="mtRotulo">Situação</p>
+    <div class="pnChips">
+      ${chipSt('DIVERGENTE','Divergentes')}${conta('ERRO') ? chipSt('ERRO','Erro') : ''}
+      ${chipSt('CONFERE','Conferem')}${chipSt('SEM','Sem material')}
+    </div>
+
+    <div class="buscaCx" style="margin-top:14px">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2 17 17" stroke-linecap="round"/></svg>
+      <input type="search" id="mtBusca" placeholder="Filtrar por cliente, OS, técnico ou material"
+             autocomplete="off" value="${esc(mtFiltro.busca)}">
+    </div>
+
+    <div class="mtLista">${vis.length ? vis.map((x, i) => `
+      <div class="mtItem ${MT[x.tipo].cls}" style="animation-delay:${Math.min(i, 14) * 18}ms">
+        <span class="mtOS" title="OS ${esc(x.os)}">…${esc(x.os.slice(-6))}</span>
+        <div class="mtTxt">
+          <b>${esc(x.cliente || 'sem nome')}</b>
+          <small>${esc(x.tecnico || 'sem técnico')}</small>
+          ${x.itens.length && x.tipo !== 'CONFERE'
+            ? `<ul class="mtDet">${x.itens.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+        </div>
+        <span class="mtSelo ${MT[x.tipo].cls}">${MT[x.tipo].selo}</span>
+      </div>`).join('') : '<p class="mtVazio">Nenhuma ordem com esse filtro.</p>'}
+    </div>`;
+
+  const bx = $('#mtBusca');
+  bx.oninput = ()=>{
+    mtFiltro.busca = bx.value;
+    const pos = bx.selectionStart;
+    desenharMaterial();
+    const nb = $('#mtBusca'); nb.focus(); nb.setSelectionRange(pos, pos);
+  };
+}
+
+/* ===========================================================
+   OS do Drive
+   Toda manhã o robô grava as OS de ontem e os alertas de material
+   numa planilha privada. Ao abrir, o avaliador pergunta qual é o
+   dia mais recente e carrega sozinho — mas nunca por cima de uma
+   fila que ainda tem ordem esperando avaliação.
+   =========================================================== */
+let driveDias = [], driveEstado = '';   // '', 'buscando', 'erro'
+const SEMANA = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const diaBonito = iso => { const d = new Date(iso + 'T12:00:00');
+  return brData(iso) + ' · ' + SEMANA[d.getDay()]; };
+
+async function fonteChamar(params){
+  const u = new URL(cfg.fonte);
+  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
+  const r = await fetch(u.toString(), {signal: AbortSignal.timeout(30000)});
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.erro || 'a fonte recusou');
+  return j;
+}
+
+async function puxarDoDrive(auto){
+  if(!cfg.fonte){ driveDias = []; driveEstado = ''; desenharDrive(); return; }
+  driveEstado = 'buscando'; desenharDrive();
+  try{
+    driveDias = (await fonteChamar({acao:'dias'})).dias || [];
+    driveEstado = '';
+  }catch(e){
+    driveEstado = 'erro'; desenharDrive();
+    if(!auto) aviso('Não consegui falar com a Fonte das OS: ' + e.message, 5000);
+    return;
+  }
+  desenharDrive();
+  const ult = driveDias[0];
+  if(!auto || !ult || ult.dia === filaDia) return;
+  if(!fila.length || !pendentes().length) carregarDia(ult.dia);
+  else aviso('As OS de ' + brData(ult.dia) + ' chegaram do Drive. Termine a fila atual e carregue na aba Arquivo.', 6500);
+}
+
+async function carregarDia(dia){
+  if(!dia) return;
+  const bt = $('#btDrive');
+  if(bt){ bt.disabled = true; bt.textContent = 'Carregando…'; }
+  try{
+    const j = await fonteChamar({acao:'dia', dia});
+    if(!j.os || j.os.length < 2){
+      aviso('Sem OS finalizadas em ' + brData(dia) + '.');
+    } else {
+      await lerPlanilha(j.os, 'os_' + dia);
+    }
+    if(j.materiais && j.materiais.length) lerMateriais(j.materiais, 'materiais_' + dia);
+    aviso('OS de ' + brData(dia) + ' carregadas do Drive · ' + Math.max(0, (j.os || []).length - 1) + ' ordens.');
+  }catch(e){
+    aviso('Não consegui carregar ' + brData(dia) + ': ' + e.message, 5000);
+  }
+  desenharDrive();
+}
+
+function desenharDrive(){
+  const el = $('#driveCx');
+  if(!el) return;
+  const ico = `<span class="dIco"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+      <path d="M6.5 15.5h8a3.5 3.5 0 0 0 .4-7A5 5 0 0 0 5.2 8a3.8 3.8 0 0 0 1.3 7.5Z" stroke-linejoin="round"/>
+      <path d="M10 8.5v5m0 0-2-2m2 2 2-2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  if(!cfg.fonte){
+    el.innerHTML = `<div class="drive apagado">${ico}<div class="dTxt"><b>Carregar sozinho do Drive</b>
+      <small>Cole a Fonte das OS em Ajustes e o avaliador puxa as OS de ontem ao abrir.</small></div>
+      <button class="bt neutro fino" data-ir="ajustes">Ajustes</button></div>`;
+    return;
+  }
+  if(driveEstado === 'buscando' && !driveDias.length){
+    el.innerHTML = `<div class="drive">${ico}<div class="dTxt"><b>Procurando as OS no Drive…</b>
+      <small>a planilha do robô</small></div></div>`;
+    return;
+  }
+  if(driveEstado === 'erro'){
+    el.innerHTML = `<div class="drive apagado">${ico}<div class="dTxt"><b>A Fonte das OS não respondeu</b>
+      <small>Confira a URL em Ajustes ou tente de novo.</small></div>
+      <button class="bt neutro fino" onclick="puxarDoDrive(false)">Tentar de novo</button></div>`;
+    return;
+  }
+  if(!driveDias.length){
+    el.innerHTML = `<div class="drive apagado">${ico}<div class="dTxt"><b>Nada no Drive ainda</b>
+      <small>O robô grava as OS de ontem todo dia às 6h30.</small></div></div>`;
+    return;
+  }
+  const sel = filaDia && driveDias.some(d => d.dia === filaDia) ? filaDia : driveDias[0].dia;
+  el.innerHTML = `<div class="drive">${ico}
+    <div class="dTxt"><b>OS do Drive</b>
+      <small>${filaDia ? `Na fila: <span class="ok">${esc(diaBonito(filaDia))}</span>` : 'preparadas pelo robô do HubSoft'}</small></div>
+    <select id="driveSel" aria-label="Dia">${driveDias.map(d =>
+      `<option value="${esc(d.dia)}" ${d.dia === sel ? 'selected' : ''}>${esc(diaBonito(d.dia))} · ${d.ordens} OS${
+        d.divergentes ? ' · ' + d.divergentes + ' ⚠' : ''}</option>`).join('')}</select>
+    <button class="bt fino" id="btDrive">Carregar</button></div>`;
+  $('#btDrive').onclick = ()=>{
+    const dia = $('#driveSel').value;
+    const pend = pendentes().length;
+    if(fila.length && pend && dia !== filaDia &&
+       !confirm('Ainda há ' + pend + ' ordem(ns) sem avaliação na fila. Trocar pelas OS de ' + brData(dia) + '?')) return;
+    carregarDia(dia);
+  };
+}
+
 /* ---------- memória local ---------- */
 function guardar(){
   try{
     localStorage.setItem(KA, JSON.stringify({
       fila: fila.map(o => Object.assign({}, o, {fotos: []})),
-      avaliacoes, quando: Date.now(),
+      avaliacoes, quando: Date.now(), dia: filaDia,
     }));
   }catch(e){ /* cota cheia: segue sem guardar */ }
   // a capa mostra quantas faltam: precisa saber que uma acabou de sair
@@ -2690,8 +3080,13 @@ function recuperar(){
       fila = a.fila;
       avaliacoes = a.avaliacoes || [];
       avaliacoes.forEach(x => jaAvaliadas.add(String(x.os)));
+      filaDia = a.dia || '';
     }
   }catch(e){ /* começa do zero */ }
+  try{
+    const m = JSON.parse(localStorage.getItem(KM) || 'null');
+    if(m && m.linhas && Date.now() - m.quando < 7 * 86400000) material = m;
+  }catch(e){ /* sem alertas guardados */ }
 }
 
 function atualizarMenu(){
@@ -2756,6 +3151,7 @@ else irPara(telaInicial);
 checarPonte();
 setInterval(checarPonte, 15000);
 conferirPlanilha();
+puxarDoDrive(true);
 
 
 </script>
